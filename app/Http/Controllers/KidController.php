@@ -10,7 +10,7 @@ class KidController extends Controller
 {
     public function index()
     {
-        $kids = Kid::where('parent_id', Auth::id())->get();
+        $kids = Kid::where('parent_id', Auth::id())->paginate(5);
 
         return view('kids.index', compact('kids'));
     }
@@ -24,8 +24,8 @@ class KidController extends Controller
     {
 
         $request->validate([
-            'name' => 'required',
-            'school_name' => 'required',
+            'name' => 'required|max:100',
+            'school_name' => 'required|max:150',
             'address' => 'required',
         ]);
 
@@ -71,6 +71,12 @@ class KidController extends Controller
             'address' => $request->address,
             'pickup_point' => $request->pickup_point,
             'dropoff_point' => $request->dropoff_point,
+        ]);
+
+        $request->validate([
+            'name' => 'required|max:100',
+            'school_name' => 'required|max:150',
+            'address' => 'required',
         ]);
 
         return redirect('/kids')->with('success', 'Data anak berhasil diupdate');

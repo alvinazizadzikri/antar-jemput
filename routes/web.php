@@ -18,7 +18,7 @@ Route::post('/register',[AuthController::class,'register']);
 Route::get('/logout',[AuthController::class,'logout']);
 
 Route::get('/dashboard', function(){
-    return "HALAMAN DASHBOARD";
+    return view('dashboard');
 })->middleware('auth');
 
 Route::resource('kids', KidController::class)->middleware('auth');
