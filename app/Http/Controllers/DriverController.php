@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Driver;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DriverController extends Controller
@@ -12,7 +13,9 @@ class DriverController extends Controller
      */
     public function index()
     {
-        return Driver::with('user')->get();
+        $drivers = Driver::with('user')->get();
+
+        return view('drivers.index', compact('drivers'));
     }
 
     /**
@@ -20,7 +23,9 @@ class DriverController extends Controller
      */
     public function create()
     {
-        //
+        $users = User::where('role', 'driver')->get();
+
+        return view('drivers.create', compact('users'));
     }
 
     /**
@@ -29,32 +34,31 @@ class DriverController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
+
+            'user_id' => 'required',
+
             'vehicle_type' => 'required',
+
             'plate_number' => 'required',
+
+            'status' => 'required',
+
         ]);
 
-        // buat user driver
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt('123456'),
-            'role' => 'driver',
-        ]);
+        Driver::create([
 
-        // buat data driver
-        $driver = Driver::create([
-            'user_id' => $user->id,
+            'user_id' => $request->user_id,
+
             'vehicle_type' => $request->vehicle_type,
+
             'plate_number' => $request->plate_number,
-            'status' => 'offline',
+
+            'status' => $request->status,
+
         ]);
 
-        return response()->json([
-            'message' => 'Driver berhasil dibuat',
-            'data' => $driver,
-        ]);
+        return redirect('/admin/drivers')
+            ->with('success', 'Driver berhasil ditambahkan');
     }
 
     /**

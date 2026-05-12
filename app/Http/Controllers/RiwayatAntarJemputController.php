@@ -102,4 +102,14 @@ class RiwayatAntarJemputController extends Controller
         return redirect('/driver/jobs')
             ->with('success', 'Status berhasil diupdate');
     }
+
+    public function show($id)
+    {
+        $trip = RiwayatAntarJemput::with([
+            'kid',
+            'driver.user',
+        ])->findOrFail($id);
+
+        return view('trips.show', compact('trip'));
+    }
 }
