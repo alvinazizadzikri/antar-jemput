@@ -14,6 +14,8 @@ class Kid extends Model
         'pickup_point',
         'dropoff_point',
         'photo',
+        'latitude',
+        'longitude',
     ];
 
     public function parent()
