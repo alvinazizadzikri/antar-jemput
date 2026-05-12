@@ -13,10 +13,13 @@ class Kid extends Model
         'address',
         'pickup_point',
         'dropoff_point',
-        'photo'
+        'photo',
+        'latitude',
+        'longitude',
     ];
 
-    public function parent(){
+    public function parent()
+    {
         return $this->belongsTo(User::class, 'parent_id');
     }
 }

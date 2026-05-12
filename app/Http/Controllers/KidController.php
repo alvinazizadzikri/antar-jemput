@@ -8,9 +8,21 @@ use Illuminate\Support\Facades\Auth;
 
 class KidController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $kids = Kid::where('parent_id', Auth::id())->paginate(5);
+
+        $query = Kid::where('parent_id', auth()->id());
+
+        if ($request->search) {
+            $query->where('name', 'like', '%'.$request->search.'%')
+                ->orWhere('school_name', 'like', '%'.$request->search.'%');
+        }
+
+        if ($request->school) {
+            $query->where('school_name', $request->school);
+        }
+
+        $kids = $query->paginate(5);
 
         return view('kids.index', compact('kids'));
     }
@@ -40,6 +52,8 @@ class KidController extends Controller
             'name' => $request->name,
             'school_name' => $request->school_name,
             'address' => $request->address,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'pickup_point' => $request->pickup_point,
             'dropoff_point' => $request->dropoff_point,
             'photo' => $photo,
@@ -69,6 +83,8 @@ class KidController extends Controller
             'name' => $request->name,
             'school_name' => $request->school_name,
             'address' => $request->address,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'pickup_point' => $request->pickup_point,
             'dropoff_point' => $request->dropoff_point,
         ]);
@@ -80,6 +96,11 @@ class KidController extends Controller
         ]);
 
         return redirect('/kids')->with('success', 'Data anak berhasil diupdate');
+    }
+
+    public function show(Kid $kid)
+    {
+        return view('kids.show', compact('kid'));
     }
 
     public function destroy($id)

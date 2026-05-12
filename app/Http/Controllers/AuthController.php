@@ -57,4 +57,22 @@ class AuthController extends Controller
 
         return redirect('/login');
     }
+
+    public function profile()
+    {
+        return view('profile');
+    }
+
+    public function updateProfile(Request $request)
+    {
+
+        $user = auth()->user();
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+
+        return back()->with('success', 'Profil berhasil diupdate');
+    }
 }
