@@ -2,8 +2,12 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KidController;
+<<<<<<< HEAD
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\RiwayatAntarJemputController;
+=======
+use App\Http\Controllers\SubscriptionController;
+>>>>>>> autkid
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,6 +31,7 @@ Route::get('/dashboard', function () {
 // KIDS
 Route::resource('kids', KidController::class)->middleware('auth');
 
+<<<<<<< HEAD
 // PROFILE
 Route::get('/profile', [AuthController::class, 'profile'])->middleware('auth');
 Route::post('/profile', [AuthController::class, 'updateProfile'])->middleware('auth');
@@ -54,3 +59,17 @@ Route::prefix('driver')->group(function () {
     )->middleware('auth');
 
 });
+=======
+Route::get('/profile', [AuthController::class, 'profile'])->middleware('auth');
+Route::post('/profile', [AuthController::class, 'updateProfile'])->middleware('auth');
+
+Route::resource('subscriptions', SubscriptionController::class);
+
+Route::post('/subscriptions/{id}/pause',
+    [SubscriptionController::class, 'pause'])
+    ->name('subscriptions.pause');
+
+Route::post('/subscriptions/{id}/resume',
+    [SubscriptionController::class, 'resume'])
+    ->name('subscriptions.resume');
+>>>>>>> autkid
