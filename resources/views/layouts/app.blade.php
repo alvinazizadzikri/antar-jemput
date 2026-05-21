@@ -152,7 +152,7 @@
 
             <!-- PARENT -->
 
-            @if(auth()->user()->role == 'parent')
+            <<<<<<< HEAD @if(auth()->user()->role == 'parent')
 
                 <li class="nav-item">
 
@@ -167,63 +167,80 @@
 
             @endif
 
-            <!-- ADMIN -->
+                <!-- ADMIN -->
 
-            <!-- ADMIN -->
+                <!-- ADMIN -->
 
-            @if(auth()->user()->role == 'admin')
+                @if(auth()->user()->role == 'admin')
 
+                    <li class="nav-item">
+
+                        <a href="/kids" class="nav-link">
+
+                            <i class="bi bi-people"></i>
+                            Data Anak
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item">
+
+                        <a href="/admin/drivers" class="nav-link">
+
+                            <i class="bi bi-truck"></i>
+                            Driver
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item">
+
+                        <a href="/admin/trips" class="nav-link">
+
+                            <i class="bi bi-pin-map"></i>
+                            Assign Driver
+
+                        </a>
+
+                    </li>
+
+                @endif
+
+                <!-- DRIVER -->
+
+                @if(auth()->user()->role == 'driver')
+
+                    <li class="nav-item">
+
+                        <a href="/driver/jobs" class="nav-link">
+
+                            <i class="bi bi-briefcase"></i>
+                            Job Driver
+
+                        </a>
+
+                    </li>
+
+                @endif
+                =======
                 <li class="nav-item">
+                    <a href="/subscriptions" class="nav-link {{ request()->is('subscriptions*') ? 'active' : '' }}">
 
-                    <a href="/kids" class="nav-link">
-
-                        <i class="bi bi-people"></i>
-                        Data Anak
+                        <i class="bi bi-credit-card-fill"></i>
+                        Langganan
 
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
-                    <a href="/admin/drivers" class="nav-link">
-
-                        <i class="bi bi-truck"></i>
-                        Driver
-
+                    <a href="/profile" class="nav-link">
+                        <i class="bi bi-person-circle"></i>
+                        Profil
                     </a>
-
                 </li>
-
-                <li class="nav-item">
-
-                    <a href="/admin/trips" class="nav-link">
-
-                        <i class="bi bi-pin-map"></i>
-                        Assign Driver
-
-                    </a>
-
-                </li>
-
-            @endif
-
-            <!-- DRIVER -->
-
-            @if(auth()->user()->role == 'driver')
-
-                <li class="nav-item">
-
-                    <a href="/driver/jobs" class="nav-link">
-
-                        <i class="bi bi-briefcase"></i>
-                        Job Driver
-
-                    </a>
-
-                </li>
-
-            @endif
+                >>>>>>> autkid
 
         </ul>
 

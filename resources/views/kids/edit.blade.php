@@ -106,7 +106,15 @@
 
                         </div>
 
-                        <div id="map" class="rounded overflow-hidden"></div>
+                        <div id="map" class="rounded overflow-hidden border"></div>
+
+                        <style>
+                            #map {
+                                height: 400px;
+                                width: 100%;
+                                z-index: 1;
+                            }
+                        </style>
 
                         <small class="text-muted">
                             Klik map untuk mengganti lokasi anak.
@@ -227,75 +235,99 @@
     {{-- MAP SCRIPT --}}
     <script>
 
-        let lat = {{ $kid->latitude ?? -7.250445 }};
-        let lng = {{ $kid->longitude ?? 112.768845 }};
+        document.addEventListener("DOMContentLoaded", function () {
 
-        var map = L.map('map').setView([lat, lng], 15);
+            // DEFAULT LOCATION
+            let defaultLat = -7.250445;
+            let defaultLng = 112.768845;
 
-        setTimeout(function () {
-            map.invalidateSize();
-        }, 200);
+            // INIT MAP
+            var map = L.map('map').setView([defaultLat, defaultLng], 13);
 
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
+            // TILE
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
 
-        var marker = L.marker([lat, lng]).addTo(map)
-            .bindPopup('Lokasi Anak')
-            .openPopup();
+            // FIX BLANK MAP
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 300);
 
-        function setMarker(lat, lng) {
+            // MARKER
+            var marker;
 
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lng;
+            function setMarker(lat, lng) {
 
-            map.removeLayer(marker);
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lng;
 
-            marker = L.marker([lat, lng]).addTo(map)
-                .bindPopup('Lokasi dipilih')
-                .openPopup();
+                if (marker) {
+                    map.removeLayer(marker);
+                }
 
-            map.setView([lat, lng], 15);
+                marker = L.marker([lat, lng])
+                    .addTo(map)
+                    .bindPopup("Lokasi dipilih")
+                    .openPopup();
 
-        }
+                map.setView([lat, lng], 15);
+            }
 
-        map.on('click', function (e) {
+            // CLICK MAP
+            map.on('click', function (e) {
 
-            setMarker(
-                e.latlng.lat,
-                e.latlng.lng
-            );
-
-        });
-
-        // AUTO LOCATION
-        function getCurrentLocation() {
-
-            navigator.geolocation.getCurrentPosition(function (position) {
-
-                let lat = position.coords.latitude;
-                let lng = position.coords.longitude;
-
-                setMarker(lat, lng);
-
-            }, function () {
-
-                alert('Lokasi tidak dapat diakses');
+                setMarker(
+                    e.latlng.lat,
+                    e.latlng.lng
+                );
 
             });
 
-        }
+            // AUTO LOCATION
+            window.getCurrentLocation = function () {
 
-        // PREVIEW FOTO
-        function previewImage(event) {
+                if (navigator.geolocation) {
 
-            const image = document.getElementById('preview');
+                    navigator.geolocation.getCurrentPosition(
 
-            image.src = URL.createObjectURL(event.target.files[0]);
+                        function (position) {
 
-            image.classList.remove('d-none');
+                            let lat = position.coords.latitude;
+                            let lng = position.coords.longitude;
 
-        }
+                            setMarker(lat, lng);
+
+                        },
+
+                        function () {
+
+                            alert('Lokasi tidak dapat diakses');
+
+                        }
+
+                    );
+
+                } else {
+
+                    alert('Browser tidak mendukung geolocation');
+
+                }
+
+            };
+
+            // PREVIEW FOTO
+            window.previewImage = function (event) {
+
+                const image = document.getElementById('preview');
+
+                image.src = URL.createObjectURL(event.target.files[0]);
+
+                image.classList.remove('d-none');
+
+            };
+
+        });
 
     </script>
 
