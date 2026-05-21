@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KidController;
+use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -22,5 +23,15 @@ Route::get('/dashboard', function () {
 
 Route::resource('kids', KidController::class)->middleware('auth');
 
-Route::get('/profile',[AuthController::class,'profile'])->middleware('auth');
-Route::post('/profile',[AuthController::class,'updateProfile'])->middleware('auth');
+Route::get('/profile', [AuthController::class, 'profile'])->middleware('auth');
+Route::post('/profile', [AuthController::class, 'updateProfile'])->middleware('auth');
+
+Route::resource('subscriptions', SubscriptionController::class);
+
+Route::post('/subscriptions/{id}/pause',
+    [SubscriptionController::class, 'pause'])
+    ->name('subscriptions.pause');
+
+Route::post('/subscriptions/{id}/resume',
+    [SubscriptionController::class, 'resume'])
+    ->name('subscriptions.resume');

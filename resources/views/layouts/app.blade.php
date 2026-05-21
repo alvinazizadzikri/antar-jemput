@@ -271,6 +271,15 @@
             </li>
 
             <li class="nav-item">
+                <a href="/subscriptions" class="nav-link {{ request()->is('subscriptions*') ? 'active' : '' }}">
+
+                    <i class="bi bi-credit-card-fill"></i>
+                    Langganan
+
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a href="/profile" class="nav-link">
                     <i class="bi bi-person-circle"></i>
                     Profil
