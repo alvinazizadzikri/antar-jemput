@@ -19,8 +19,6 @@
             color: #2c3e50;
         }
 
-        /* SIDEBAR */
-
         .sidebar {
             width: 260px;
             height: 100vh;
@@ -30,6 +28,7 @@
             background: white;
             border-right: 1px solid #e9ecef;
             padding: 25px 18px;
+            overflow-y: auto;
         }
 
         .brand {
@@ -62,14 +61,10 @@
             margin-right: 10px;
         }
 
-        /* MAIN */
-
         .main {
             margin-left: 260px;
             min-height: 100vh;
         }
-
-        /* TOPBAR */
 
         .topbar {
             background: white;
@@ -86,13 +81,9 @@
             font-weight: 700;
         }
 
-        /* CONTENT */
-
         .content {
             padding: 30px;
         }
-
-        /* CARD */
 
         .card {
             border: none;
@@ -100,13 +91,9 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
 
-        /* TABLE */
-
         .table {
             vertical-align: middle;
         }
-
-        /* MOBILE */
 
         @media(max-width:992px) {
 
@@ -128,7 +115,6 @@
 <body>
 
     <!-- SIDEBAR -->
-
     <div class="sidebar">
 
         <div class="brand">
@@ -137,11 +123,10 @@
 
         <ul class="nav flex-column">
 
-            <!-- DASHBOARD -->
-
+            {{-- DASHBOARD --}}
             <li class="nav-item">
 
-                <a href="/dashboard" class="nav-link">
+                <a href="/dashboard" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
 
                     <i class="bi bi-grid"></i>
                     Dashboard
@@ -150,13 +135,12 @@
 
             </li>
 
-            <!-- PARENT -->
-
-            <<<<<<< HEAD @if(auth()->user()->role == 'parent')
+            {{-- ================= PARENT ================= --}}
+            @if(auth()->user()->role == 'parent')
 
                 <li class="nav-item">
 
-                    <a href="/kids" class="nav-link">
+                    <a href="/kids" class="nav-link {{ request()->is('kids*') ? 'active' : '' }}">
 
                         <i class="bi bi-people"></i>
                         Data Anak
@@ -165,105 +149,128 @@
 
                 </li>
 
-            @endif
-
-                <!-- ADMIN -->
-
-                <!-- ADMIN -->
-
-                @if(auth()->user()->role == 'admin')
-
-                    <li class="nav-item">
-
-                        <a href="/kids" class="nav-link">
-
-                            <i class="bi bi-people"></i>
-                            Data Anak
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a href="/admin/drivers" class="nav-link">
-
-                            <i class="bi bi-truck"></i>
-                            Driver
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a href="/admin/trips" class="nav-link">
-
-                            <i class="bi bi-pin-map"></i>
-                            Assign Driver
-
-                        </a>
-
-                    </li>
-
-                @endif
-
-                <!-- DRIVER -->
-
-                @if(auth()->user()->role == 'driver')
-
-                    <li class="nav-item">
-
-                        <a href="/driver/jobs" class="nav-link">
-
-                            <i class="bi bi-briefcase"></i>
-                            Job Driver
-
-                        </a>
-
-                    </li>
-
-                @endif
-                =======
                 <li class="nav-item">
+
                     <a href="/subscriptions" class="nav-link {{ request()->is('subscriptions*') ? 'active' : '' }}">
 
                         <i class="bi bi-credit-card-fill"></i>
                         Langganan
 
                     </a>
+
+                </li>
+
+            @endif
+
+            {{-- ================= ADMIN ================= --}}
+            @if(auth()->user()->role == 'admin')
+
+                <li class="nav-item">
+
+                    <a href="/admin/drivers" class="nav-link {{ request()->is('admin/drivers*') ? 'active' : '' }}">
+
+                        <i class="bi bi-truck"></i>
+                        Driver
+
+                    </a>
+
                 </li>
 
                 <li class="nav-item">
-                    <a href="/profile" class="nav-link">
-                        <i class="bi bi-person-circle"></i>
-                        Profil
+
+                    <a href="/admin/trips" class="nav-link {{ request()->is('admin/trips') ? 'active' : '' }}">
+
+                        <i class="bi bi-person-check"></i>
+                        Assign Driver
+
                     </a>
+
                 </li>
-                >>>>>>> autkid
+
+                <li class="nav-item">
+
+                    <a href="/admin/trips/create"
+                        class="nav-link {{ request()->is('admin/trips/create') ? 'active' : '' }}">
+                        <i class="bi bi-clock-history"></i>
+                        Riwayat Trip
+
+                    </a>
+
+                </li>
+
+            @endif
+
+            {{-- ================= DRIVER ================= --}}
+            @if(auth()->user()->role == 'driver')
+
+                <li class="nav-item">
+
+                    <a href="/driver/jobs" class="nav-link {{ request()->is('driver/jobs*') ? 'active' : '' }}">
+
+                        <i class="bi bi-bag-check"></i>
+                        Job Driver
+
+                    </a>
+
+                </li>
+
+            @endif
+
+            {{-- PROFIL --}}
+            <li class="nav-item">
+
+                <a href="/profile" class="nav-link {{ request()->is('profile') ? 'active' : '' }}">
+
+                    <i class="bi bi-person-circle"></i>
+                    Profil
+
+                </a>
+
+            </li>
 
         </ul>
 
     </div>
 
     <!-- MAIN -->
-
     <div class="main">
 
         <!-- TOPBAR -->
-
         <div class="topbar">
 
             <div class="topbar-title">
-                Dashboard
+
+                @if(request()->is('admin/drivers*'))
+                    Driver
+
+                @elseif(request()->is('admin/trips/create'))
+                    Assign Driver
+
+                @elseif(request()->is('admin/trips*'))
+                    Riwayat Trip
+
+                @elseif(request()->is('driver/jobs*'))
+                    Job Driver
+
+                @elseif(request()->is('kids*'))
+                    Data Anak
+
+                @elseif(request()->is('subscriptions*'))
+                    Langganan
+
+                @elseif(request()->is('profile'))
+                    Profil
+
+                @else
+                    Dashboard
+                @endif
+
             </div>
 
-            <div>
+            <div class="d-flex align-items-center gap-3">
 
-                <span class="me-3">
-
+                <span>
                     {{ auth()->user()->name }}
-
                 </span>
 
                 <a href="/logout" class="btn btn-danger btn-sm">
@@ -277,7 +284,6 @@
         </div>
 
         <!-- CONTENT -->
-
         <div class="content">
 
             @yield('content')
