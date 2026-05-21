@@ -54,3 +54,6 @@ Route::prefix('driver')->group(function () {
     )->middleware('auth');
 
 });
+
+Route::get('/admin/drivers/{id}/history',
+    [DriverController::class, 'history']);

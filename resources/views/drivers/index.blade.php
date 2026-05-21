@@ -29,6 +29,7 @@
                             <th>Kendaraan</th>
                             <th>Plat</th>
                             <th>Status</th>
+                            <th width="180">Aksi</th>
                         </tr>
 
                     </thead>
@@ -74,6 +75,39 @@
                                         </span>
 
                                     @endif
+
+                                </td>
+                                <td>
+
+                                    <div class="d-flex gap-2 flex-wrap">
+
+                                        <a href="/admin/drivers/{{ $driver->id }}/edit" class="btn btn-warning btn-sm">
+
+                                            <i class="bi bi-pencil-square"></i>
+
+                                        </a>
+
+                                        <a href="/admin/drivers/{{ $driver->id }}/history" class="btn btn-info btn-sm">
+
+                                            <i class="bi bi-clock-history"></i>
+
+                                        </a>
+
+                                        <form action="/admin/drivers/{{ $driver->id }}" method="POST">
+
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Yakin hapus driver?')">
+
+                                                <i class="bi bi-trash"></i>
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
 
                                 </td>
 

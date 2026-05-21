@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Driver;
 use App\Models\User;
+use App\Models\RiwayatAntarJemput;
 use Illuminate\Http\Request;
 
 class DriverController extends Controller
@@ -72,37 +73,69 @@ class DriverController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Driver $driver)
+    public function edit($id)
     {
-        //
+        $driver = Driver::findOrFail($id);
+
+        return view('drivers.edit', compact('driver'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Driver $driver)
+    public function update(Request $request, $id)
     {
-        $driver->update($request->only([
-            'vehicle_type',
-            'plate_number',
-            'status',
-        ]));
+        $request->validate([
 
-        return response()->json([
-            'message' => 'Driver updated',
-            'data' => $driver,
+            'vehicle_type' => 'required',
+
+            'plate_number' => 'required',
+
+            'status' => 'required',
+
         ]);
+
+        $driver = Driver::findOrFail($id);
+
+        $driver->update([
+
+            'vehicle_type' => $request->vehicle_type,
+
+            'plate_number' => $request->plate_number,
+
+            'status' => $request->status,
+
+        ]);
+
+        return redirect('/admin/drivers')
+            ->with('success', 'Driver berhasil diupdate');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Driver $driver)
+    public function destroy($id)
     {
+        $driver = Driver::findOrFail($id);
+
         $driver->delete();
 
-        return response()->json([
-            'message' => 'Driver deleted',
-        ]);
+        return redirect('/admin/drivers')
+            ->with('success', 'Driver berhasil dihapus');
+    }
+
+    public function history($id)
+    {
+        $driver = Driver::findOrFail($id);
+
+        $trips = RiwayatAntarJemput::with('kid')
+            ->where('driver_id', $id)
+            ->latest()
+            ->get();
+
+        return view('drivers.history', compact(
+            'driver',
+            'trips'
+        ));
     }
 }
