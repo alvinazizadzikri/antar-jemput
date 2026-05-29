@@ -7,6 +7,8 @@
     <title>Antar Jemput</title>
 
     <!-- Bootstrap -->
+    <!-- LEAFLET CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Bootstrap Icon -->
@@ -125,107 +127,68 @@
 
             {{-- DASHBOARD --}}
             <li class="nav-item">
-
                 <a href="/dashboard" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
-
                     <i class="bi bi-grid"></i>
                     Dashboard
-
                 </a>
-
             </li>
 
-            {{-- ================= PARENT ================= --}}
+            {{-- PARENT --}}
             @if(auth()->user()->role == 'parent')
 
                 <li class="nav-item">
-
                     <a href="/kids" class="nav-link {{ request()->is('kids*') ? 'active' : '' }}">
-
                         <i class="bi bi-people"></i>
                         Data Anak
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
                     <a href="/subscriptions" class="nav-link {{ request()->is('subscriptions*') ? 'active' : '' }}">
-
                         <i class="bi bi-credit-card-fill"></i>
                         Langganan
-
                     </a>
-
                 </li>
 
             @endif
 
-            {{-- ================= ADMIN ================= --}}
+            {{-- ADMIN --}}
             @if(auth()->user()->role == 'admin')
 
                 <li class="nav-item">
-
                     <a href="/admin/drivers" class="nav-link {{ request()->is('admin/drivers*') ? 'active' : '' }}">
-
                         <i class="bi bi-truck"></i>
                         Driver
-
                     </a>
-
                 </li>
 
                 <li class="nav-item">
-
-                    <a href="/admin/trips" class="nav-link {{ request()->is('admin/trips') ? 'active' : '' }}">
-
+                    <a href="/admin/trips" class="nav-link {{ request()->is('admin/trips*') ? 'active' : '' }}">
                         <i class="bi bi-person-check"></i>
                         Assign Driver
-
                     </a>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <a href="/admin/trips/create"
-                        class="nav-link {{ request()->is('admin/trips/create') ? 'active' : '' }}">
-                        <i class="bi bi-clock-history"></i>
-                        Riwayat Trip
-
-                    </a>
-
                 </li>
 
             @endif
 
-            {{-- ================= DRIVER ================= --}}
+            {{-- DRIVER --}}
             @if(auth()->user()->role == 'driver')
 
                 <li class="nav-item">
-
                     <a href="/driver/jobs" class="nav-link {{ request()->is('driver/jobs*') ? 'active' : '' }}">
-
                         <i class="bi bi-bag-check"></i>
                         Job Driver
-
                     </a>
-
                 </li>
 
             @endif
 
             {{-- PROFIL --}}
             <li class="nav-item">
-
                 <a href="/profile" class="nav-link {{ request()->is('profile') ? 'active' : '' }}">
-
                     <i class="bi bi-person-circle"></i>
                     Profil
-
                 </a>
-
             </li>
 
         </ul>
@@ -291,7 +254,8 @@
         </div>
 
     </div>
-
+    <!-- LEAFLET JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </body>
 
 </html>

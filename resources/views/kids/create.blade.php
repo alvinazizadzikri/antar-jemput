@@ -35,7 +35,7 @@
                         </label>
 
                         <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                            value="{{ old('name') }}" placeholder="Masukkan nama anak">
+                            value="{{ old('name') }}" placeholder="Masukkan nama anak"required>
 
                         @error('name')
                             <div class="invalid-feedback">

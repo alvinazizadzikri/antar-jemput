@@ -48,7 +48,8 @@ class KidController extends Controller
         }
 
         Kid::create([
-            'parent_id' => Auth::id(),
+            'parent_id' => auth()->id(),
+
             'name' => $request->name,
             'school_name' => $request->school_name,
             'address' => $request->address,
@@ -56,7 +57,7 @@ class KidController extends Controller
             'longitude' => $request->longitude,
             'pickup_point' => $request->pickup_point,
             'dropoff_point' => $request->dropoff_point,
-            'photo' => $photo,
+            'photo' => $photo ?? null,
         ]);
 
         return redirect('/kids')->with('success', 'Data anak berhasil ditambahkan');
@@ -71,15 +72,15 @@ class KidController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'name' => 'required|max:100',
+            'school_name' => 'required|max:150',
+            'address' => 'required',
+        ]);
 
         $kid = Kid::where('parent_id', Auth::id())->findOrFail($id);
 
-        if ($request->hasFile('photo')) {
-            $photo = $request->file('photo')->store('kids', 'public');
-            $kid->photo = $photo;
-        }
-
-        $kid->update([
+        $data = [
             'name' => $request->name,
             'school_name' => $request->school_name,
             'address' => $request->address,
@@ -87,13 +88,14 @@ class KidController extends Controller
             'longitude' => $request->longitude,
             'pickup_point' => $request->pickup_point,
             'dropoff_point' => $request->dropoff_point,
-        ]);
+        ];
 
-        $request->validate([
-            'name' => 'required|max:100',
-            'school_name' => 'required|max:150',
-            'address' => 'required',
-        ]);
+        // upload foto baru
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('kids', 'public');
+        }
+
+        $kid->update($data);
 
         return redirect('/kids')->with('success', 'Data anak berhasil diupdate');
     }
