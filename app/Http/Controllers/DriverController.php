@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Driver;
-use App\Models\User;
 use App\Models\RiwayatAntarJemput;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DriverController extends Controller
@@ -137,5 +137,19 @@ class DriverController extends Controller
             'driver',
             'trips'
         ));
+    }
+
+    public function driverJobs()
+    {
+        $driver = auth()->user()->driver;
+
+        $jobs = RiwayatAntarJemput::with([
+            'kid',
+            'kid.parent',
+        ])
+            ->where('driver_id', $driver->id)
+            ->get();
+
+        return view('driver.jobs', compact('jobs'));
     }
 }
