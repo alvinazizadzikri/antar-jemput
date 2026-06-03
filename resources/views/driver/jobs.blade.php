@@ -24,97 +24,123 @@
 
                         <tr>
                             <th>Anak</th>
-                            <th>Jam Jemput</th>
+                            <th>Orang Tua</th>
+                            <th>Alamat</th>
+                            <th>Langganan</th>
                             <th>Status</th>
-                            <th width="250">Aksi</th>
+                            <th>Aksi</th>
                         </tr>
 
                     </thead>
 
                     <tbody>
 
-                    @foreach($trips as $trip)
+                        @foreach($trips as $trip)
 
-                        <tr>
+                            <tr>
 
-                            <td>{{ $trip->kid->name }}</td>
+                                <td>
+                                    {{ $trip->kid->name }}
+                                </td>
 
-                            <td>{{ $trip->pickup_time }}</td>
+                                <td>
+                                    {{ $trip->kid->parent->name ?? '-' }}
+                                </td>
 
-                            <td>
+                                <td>
+                                    {{ $trip->kid->address }}
+                                </td>
 
-                                @if($trip->status == 'assigned')
+                                <td>
 
-                                    <span class="badge bg-secondary">
-                                        Ditugaskan
-                                    </span>
+                                    @if($trip->kid->subscriptions->count())
 
-                                @elseif($trip->status == 'on_pickup')
+                                        {{ $trip->kid->subscriptions->first()->package_name }}
 
-                                    <span class="badge bg-warning text-dark">
-                                        Menuju Jemput
-                                    </span>
+                                        <br>
 
-                                @elseif($trip->status == 'picked')
+                                        <span class="badge bg-success">
+                                            {{ $trip->kid->subscriptions->first()->status }}
+                                        </span>
 
-                                    <span class="badge bg-primary">
-                                        Dijemput
-                                    </span>
+                                    @else
 
-                                @elseif($trip->status == 'on_delivery')
+                                        <span class="badge bg-danger">
+                                            Belum Langganan
+                                        </span>
 
-                                    <span class="badge bg-success">
-                                        Diantar
-                                    </span>
+                                    @endif
 
-                                @endif
+                                </td>
 
-                            </td>
+                                <td>
 
-                            <td>
+                                    @if($trip->status == 'assigned')
 
-                                <form action="/driver/jobs/{{ $trip->id }}/status"
-                                      method="POST">
-
-                                    @csrf
-                                    @method('PUT')
-
-                                    <select name="status"
-                                            class="form-control mb-2">
-
-                                        <option value="assigned"
-                                            {{ $trip->status == 'assigned' ? 'selected' : '' }}>
+                                        <span class="badge bg-secondary">
                                             Ditugaskan
-                                        </option>
+                                        </span>
 
-                                        <option value="on_pickup"
-                                            {{ $trip->status == 'on_pickup' ? 'selected' : '' }}>
+                                    @elseif($trip->status == 'on_pickup')
+
+                                        <span class="badge bg-warning text-dark">
                                             Menuju Jemput
-                                        </option>
+                                        </span>
 
-                                        <option value="picked"
-                                            {{ $trip->status == 'picked' ? 'selected' : '' }}>
+                                    @elseif($trip->status == 'picked')
+
+                                        <span class="badge bg-primary">
                                             Dijemput
-                                        </option>
+                                        </span>
 
-                                        <option value="on_delivery"
-                                            {{ $trip->status == 'on_delivery' ? 'selected' : '' }}>
+                                    @elseif($trip->status == 'on_delivery')
+
+                                        <span class="badge bg-success">
                                             Diantar
-                                        </option>
+                                        </span>
 
-                                    </select>
+                                    @endif
 
-                                    <button class="btn btn-primary btn-sm w-100">
-                                        Update Status
-                                    </button>
+                                </td>
 
-                                </form>
+                                <td>
 
-                            </td>
+                                    <form action="/driver/jobs/{{ $trip->id }}/status" method="POST">
 
-                        </tr>
+                                        @csrf
+                                        @method('PUT')
 
-                    @endforeach
+                                        <select name="status" class="form-control mb-2">
+
+                                            <option value="assigned" {{ $trip->status == 'assigned' ? 'selected' : '' }}>
+                                                Ditugaskan
+                                            </option>
+
+                                            <option value="on_pickup" {{ $trip->status == 'on_pickup' ? 'selected' : '' }}>
+                                                Menuju Jemput
+                                            </option>
+
+                                            <option value="picked" {{ $trip->status == 'picked' ? 'selected' : '' }}>
+                                                Dijemput
+                                            </option>
+
+                                            <option value="on_delivery" {{ $trip->status == 'on_delivery' ? 'selected' : '' }}>
+                                                Diantar
+                                            </option>
+
+                                        </select>
+
+                                        <button class="btn btn-primary btn-sm w-100">
+                                            Update Status
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        @endforeach
 
                     </tbody>
 

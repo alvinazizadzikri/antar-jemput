@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Kid extends Model
 {
     protected $fillable = [
-        'user_id',
+        'parent_id',
         'name',
         'school_name',
         'address',
@@ -28,8 +28,8 @@ class Kid extends Model
         return $this->hasMany(RiwayatAntarJemput::class);
     }
 
-    public function subscriptions()
+    public function subscription()
     {
-        return $this->hasMany(Subscription::class);
+        return $this->hasOne(Subscription::class);
     }
 }

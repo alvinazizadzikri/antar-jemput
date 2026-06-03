@@ -25,6 +25,78 @@
                 </tr>
 
                 <tr>
+                    <th>Nama Orang Tua</th>
+                    <td>
+                        {{ $trip->kid->parent->name ?? '-' }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Alamat Rumah</th>
+                    <td>
+                        {{ $trip->kid->address }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Sekolah</th>
+                    <td>
+                        {{ $trip->kid->school_name }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Titik Jemput</th>
+                    <td>
+                        {{ $trip->kid->pickup_point }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Titik Antar</th>
+                    <td>
+                        {{ $trip->kid->dropoff_point }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Paket Langganan</th>
+                    <td>
+
+                        @php
+                            $subscription = $trip->kid->subscriptions->first();
+                        @endphp
+
+                        @if($subscription)
+
+                            {{ $subscription->package_name }}
+
+                            (Rp {{ number_format($subscription->price, 0, ',', '.') }})
+
+                        @else
+
+                            Belum Berlangganan
+
+                        @endif
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Foto Anak</th>
+
+                    <td>
+
+                        @if($trip->kid->photo)
+
+                            <img src="{{ asset('storage/' . $trip->kid->photo) }}" width="200" class="img-thumbnail">
+
+                        @endif
+
+                    </td>
+                </tr>
+
+                <tr>
                     <th>Driver</th>
 
                     <td>

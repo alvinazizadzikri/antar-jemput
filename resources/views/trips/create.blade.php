@@ -17,6 +17,10 @@
 
                     <option value="{{ $kid->id }}">
                         {{ $kid->name }}
+                        -
+                        {{ $kid->parent->name ?? '-' }}
+                        -
+                        {{ $kid->school_name }}
                     </option>
 
                 @endforeach
