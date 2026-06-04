@@ -1,46 +1,78 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
-    <h3 class="fw-bold">Dashboard Admin</h3>
-    <p class="text-muted">Ringkasan data sistem antar jemput anak sekolah</p>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <p>Total Anak</p>
-                    <h2 class="fw-bold text-primary">{{ $totalKids ?? 0 }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <p>Total Driver</p>
-                    <h2 class="fw-bold text-success">{{ $totalDrivers ?? 0 }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <p>Langganan Aktif</p>
-                    <h2 class="fw-bold text-warning">{{ $totalSubscriptions ?? 0 }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <p>Total Perjalanan</p>
-                    <h2 class="fw-bold text-danger">{{ $totalTrips ?? 0 }}</h2>
-                </div>
+    <div class="section-header">
+        <div>
+            <div class="page-title">Dashboard Admin</div>
+            <div class="page-subtitle">
+                Ringkasan data sistem antar jemput anak sekolah
             </div>
         </div>
     </div>
-</div>
+
+    <div class="row g-4">
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-card-label">Total Anak</div>
+                        <h2 class="stat-card-value">{{ $totalKids ?? 0 }}</h2>
+                    </div>
+
+                    <div class="stat-card-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-card-label">Total Sopir</div>
+                        <h2 class="stat-card-value text-success">{{ $totalDrivers ?? 0 }}</h2>
+                    </div>
+
+                    <div class="stat-card-icon">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-card-label">Langganan Aktif</div>
+                        <h2 class="stat-card-value text-warning">{{ $totalSubscriptions ?? 0 }}</h2>
+                    </div>
+
+                    <div class="stat-card-icon">
+                        <i class="bi bi-credit-card-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-card-label">Total Perjalanan</div>
+                        <h2 class="stat-card-value text-danger">{{ $totalTrips ?? 0 }}</h2>
+                    </div>
+
+                    <div class="stat-card-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 @endsection

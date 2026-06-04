@@ -28,8 +28,28 @@ class Kid extends Model
         return $this->hasMany(RiwayatAntarJemput::class);
     }
 
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
     public function subscription()
     {
-        return $this->hasOne(Subscription::class);
+        return $this->hasOne(Subscription::class)
+            ->where('status', 'active')
+            ->latestOfMany();
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(Subscription::class)
+            ->whereIn('status', ['pending', 'active'])
+            ->latestOfMany();
+    }
+
+    public function latestSubscription()
+    {
+        return $this->hasOne(Subscription::class)
+            ->latestOfMany();
     }
 }

@@ -59,6 +59,31 @@ Route::post('/profile', [ProfileController::class, 'update'])
 Route::resource('subscriptions', SubscriptionController::class)
     ->middleware('auth');
 
+Route::get(
+    '/subscriptions/{id}/payment',
+    [SubscriptionController::class, 'payment']
+)
+    ->middleware('auth')
+    ->name('subscriptions.payment');
+
+Route::post(
+    '/subscriptions/{id}/pay',
+    [SubscriptionController::class, 'startPayment']
+)
+    ->middleware('auth')
+    ->name('subscriptions.pay');
+
+Route::post(
+    '/transactions/{id}/simulate-success',
+    [SubscriptionController::class, 'simulatePaymentSuccess']
+)
+    ->middleware('auth')
+    ->name('transactions.simulateSuccess');
+
+// =======================
+// RIWAYAT ORANG TUA
+// =======================
+
 Route::get('/riwayat', [RiwayatAntarJemputController::class, 'parentHistory'])
     ->middleware('auth')
     ->name('riwayat.parent');

@@ -1,0 +1,321 @@
+:root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-soft: #eff6ff;
+    --text-dark: #17233c;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --shadow: 0 16px 45px rgba(15, 23, 42, 0.12);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body.auth-body,
+body.welcome-body {
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 45%, #f8fafc 100%);
+    position: relative;
+    overflow-x: hidden;
+}
+
+body.auth-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+body.auth-body::before,
+body.welcome-body::before {
+    content: '';
+    position: absolute;
+    width: 480px;
+    height: 480px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    top: -130px;
+    left: -120px;
+    filter: blur(10px);
+}
+
+body.auth-body::after,
+body.welcome-body::after {
+    content: '';
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.10);
+    bottom: -140px;
+    right: -120px;
+    filter: blur(10px);
+}
+
+.auth-card {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 440px;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(14px);
+    border-radius: 26px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.auth-header {
+    text-align: center;
+    padding: 38px 34px 12px;
+}
+
+.auth-logo {
+    width: 86px;
+    height: 86px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #60a5fa);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+}
+
+.auth-header h2 {
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.auth-header p {
+    color: var(--text-muted);
+    font-size: 15px;
+    margin-bottom: 0;
+}
+
+.auth-body-content {
+    padding: 16px 34px 38px;
+}
+
+.auth-label {
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.auth-input-group {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: #f8fafc;
+}
+
+.auth-input-group .input-group-text {
+    border: none;
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.auth-input-group .form-control {
+    height: 52px;
+    border: none;
+    background: #f8fafc;
+    box-shadow: none !important;
+}
+
+.auth-input-group .form-control:focus {
+    background: white;
+}
+
+.auth-btn {
+    height: 52px;
+    border: none;
+    border-radius: 14px;
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    transition: 0.2s ease-in-out;
+}
+
+.auth-btn:hover {
+    background: var(--primary-hover);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.25);
+}
+
+.auth-link {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    color: var(--primary-hover);
+}
+
+.alert {
+    border: none;
+    border-radius: 14px;
+}
+
+/* Welcome */
+.welcome-nav {
+    position: relative;
+    z-index: 10;
+    padding: 26px 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-brand {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.welcome-nav-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.welcome-btn {
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.welcome-btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.welcome-btn-primary:hover {
+    background: var(--primary-hover);
+    color: white;
+}
+
+.welcome-btn-light {
+    background: white;
+    color: var(--primary);
+    border: 1px solid var(--border-color);
+}
+
+.welcome-btn-light:hover {
+    color: var(--primary-hover);
+}
+
+.welcome-hero {
+    position: relative;
+    z-index: 10;
+    min-height: calc(100vh - 92px);
+    display: flex;
+    align-items: center;
+    padding: 40px 36px 70px;
+}
+
+.welcome-hero-card {
+    width: 100%;
+    max-width: 1100px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(14px);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: var(--shadow);
+    padding: 52px;
+}
+
+.welcome-badge {
+    display: inline-block;
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
+.welcome-title {
+    font-size: 46px;
+    line-height: 1.15;
+    font-weight: 900;
+    color: var(--text-dark);
+    margin-bottom: 18px;
+}
+
+.welcome-subtitle {
+    color: var(--text-muted);
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 28px;
+}
+
+.welcome-feature {
+    display: flex;
+    align-items: start;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.welcome-feature-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.welcome-illustration {
+    background: linear-gradient(135deg, var(--primary), #60a5fa);
+    border-radius: 28px;
+    min-height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 120px;
+    box-shadow: 0 14px 34px rgba(37, 99, 235, 0.25);
+}
+
+@media (max-width: 768px) {
+    .welcome-nav {
+        padding: 22px;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .welcome-hero {
+        padding: 24px 18px 50px;
+    }
+
+    .welcome-hero-card {
+        padding: 30px;
+    }
+
+    .welcome-title {
+        font-size: 34px;
+    }
+
+    .welcome-illustration {
+        min-height: 240px;
+        font-size: 76px;
+        margin-top: 28px;
+    }
+}

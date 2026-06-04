@@ -2,82 +2,116 @@
 
 @section('content')
 
-    <h3>Assign Driver</h3>
+    <div class="section-header">
+        <div>
+            <div class="page-title">Penugasan Sopir</div>
+            <div class="page-subtitle">
+                Pilih anak, sopir, jam jemput, dan status awal perjalanan
+            </div>
+        </div>
+    </div>
 
-    <form action="/admin/trips" method="POST">
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
 
-        @csrf
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
 
-        <div class="mb-3">
-            <label>Anak</label>
+    <div class="form-card">
 
-            <select name="kid_id" class="form-control">
+        <div class="form-section-title">
+            Form Penugasan Sopir
+        </div>
 
-                @foreach($kids as $kid)
+        <form action="/admin/trips" method="POST">
+            @csrf
 
-                    <option value="{{ $kid->id }}">
-                        {{ $kid->name }}
-                        -
-                        {{ $kid->parent->name ?? '-' }}
-                        -
-                        {{ $kid->school_name }}
+            <div class="mb-3">
+                <label class="form-label">Anak</label>
+
+                <select name="kid_id" class="form-select" required>
+                    <option value="">-- Pilih Anak --</option>
+
+                    @foreach($kids as $kid)
+                        <option value="{{ $kid->id }}">
+                            {{ $kid->name }}
+                            -
+                            {{ $kid->parent->name ?? '-' }}
+                            -
+                            {{ $kid->school_name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Sopir</label>
+
+                <select name="driver_id" class="form-select" required>
+                    <option value="">-- Pilih Sopir --</option>
+
+                    @foreach($drivers as $driver)
+                        <option value="{{ $driver->id }}">
+                            {{ $driver->user->name }}
+                            -
+                            {{ $driver->vehicle_type ?? '-' }}
+                            -
+                            {{ $driver->plate_number ?? '-' }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Jam Jemput</label>
+
+                <input type="time" name="pickup_time" class="form-control" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Status Awal</label>
+
+                <select name="status" class="form-select" required>
+                    <option value="assigned">
+                        Ditugaskan
                     </option>
 
-                @endforeach
-
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label>Driver</label>
-
-            <select name="driver_id" class="form-control">
-
-                @foreach($drivers as $driver)
-
-                    <option value="{{ $driver->id }}">
-                        {{ $driver->user->name }}
+                    <option value="on_pickup">
+                        Menuju Jemput
                     </option>
 
-                @endforeach
+                    <option value="picked">
+                        Dijemput
+                    </option>
 
-            </select>
-        </div>
+                    <option value="on_delivery">
+                        Diantar
+                    </option>
 
-        <div class="mb-3">
-            <label>Jam Jemput</label>
+                    <option value="completed">
+                        Selesai
+                    </option>
+                </select>
+            </div>
 
-            <input type="time" name="pickup_time" class="form-control">
-        </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary-custom">
+                    <i class="bi bi-save"></i>
+                    Simpan Penugasan
+                </button>
 
-        <div class="mb-3">
-            <label>Status</label>
+                <a href="/admin/trips" class="btn btn-secondary-custom">
+                    Kembali
+                </a>
+            </div>
+        </form>
 
-            <select name="status" class="form-control">
-
-                <option value="assigned">
-                    Ditugaskan
-                </option>
-
-                <option value="on_pickup">
-                    Menuju Jemput
-                </option>
-
-                <option value="picked">
-                    Dijemput
-                </option>
-
-                <option value="on_delivery">
-                    Diantar
-                </option>
-
-            </select>
-        </div>
-
-        <button class="btn btn-primary">
-            Simpan
-        </button>
-
-    </form>
+    </div>
 
 @endsection

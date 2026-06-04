@@ -2,45 +2,63 @@
 
 @section('content')
 
-    <h3 class="mb-3">Job Driver</h3>
+    <div class="section-header">
+        <div>
+            <div class="page-title">Tugas Sopir</div>
+            <div class="page-subtitle">
+                Daftar tugas antar jemput anak yang diberikan kepada sopir
+            </div>
+        </div>
+    </div>
 
     @if(session('success'))
-
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
-
     @endif
 
-    <div class="card">
-
+    <div class="page-card">
         <div class="card-body">
 
             <div class="table-responsive">
-
-                <table class="table table-bordered table-striped align-middle">
-
-                    <thead class="table-dark">
-
+                <table class="custom-table table-compact">
+                    <thead>
                         <tr>
                             <th>Anak</th>
                             <th>Orang Tua</th>
                             <th>Alamat</th>
                             <th>Langganan</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th style="width: 320px;">Aksi</th>
                         </tr>
-
                     </thead>
 
                     <tbody>
+                        @forelse($trips as $trip)
 
-                        @foreach($trips as $trip)
+                            @php
+                                $statusText = [
+                                    'assigned' => 'Ditugaskan',
+                                    'on_pickup' => 'Menuju Jemput',
+                                    'picked' => 'Dijemput',
+                                    'on_delivery' => 'Diantar',
+                                    'completed' => 'Selesai',
+                                ];
+
+                                $statusClass = [
+                                    'assigned' => 'badge-assigned',
+                                    'on_pickup' => 'badge-pending',
+                                    'picked' => 'badge-active',
+                                    'on_delivery' => 'badge-active',
+                                    'completed' => 'badge-active',
+                                ];
+                            @endphp
 
                             <tr>
-
                                 <td>
-                                    {{ $trip->kid->name }}
+                                    <div class="fw-bold">
+                                        {{ $trip->kid->name ?? '-' }}
+                                    </div>
                                 </td>
 
                                 <td>
@@ -48,70 +66,37 @@
                                 </td>
 
                                 <td>
-                                    {{ $trip->kid->address }}
+                                    {{ $trip->kid->address ?? '-' }}
                                 </td>
 
                                 <td>
-
                                     @if($trip->kid->subscription)
+                                        <div class="fw-semibold">
+                                            {{ $trip->kid->subscription->package_name }}
+                                        </div>
 
-                                        {{ $trip->kid->subscription->package_name }}
-
-                                        <br>
-
-                                        <span class="badge bg-success">
+                                        <span class="badge-status badge-active">
                                             {{ $trip->kid->subscription->status }}
                                         </span>
-
                                     @else
-
-                                        <span class="badge bg-danger">
+                                        <span class="badge-status badge-danger">
                                             Belum Langganan
                                         </span>
-
                                     @endif
-
                                 </td>
 
                                 <td>
-
-                                    @if($trip->status == 'assigned')
-
-                                        <span class="badge bg-secondary">
-                                            Ditugaskan
-                                        </span>
-
-                                    @elseif($trip->status == 'on_pickup')
-
-                                        <span class="badge bg-warning text-dark">
-                                            Menuju Jemput
-                                        </span>
-
-                                    @elseif($trip->status == 'picked')
-
-                                        <span class="badge bg-primary">
-                                            Dijemput
-                                        </span>
-
-                                    @elseif($trip->status == 'on_delivery')
-
-                                        <span class="badge bg-success">
-                                            Diantar
-                                        </span>
-
-                                    @endif
-
+                                    <span class="badge-status {{ $statusClass[$trip->status] ?? 'badge-assigned' }}">
+                                        {{ $statusText[$trip->status] ?? $trip->status }}
+                                    </span>
                                 </td>
 
                                 <td>
-
-                                    <form action="/driver/jobs/{{ $trip->id }}/status" method="POST">
-
+                                    <form action="/driver/jobs/{{ $trip->id }}/status" method="POST" class="action-form">
                                         @csrf
                                         @method('PUT')
 
-                                        <select name="status" class="form-control mb-2">
-
+                                        <select name="status" class="form-select">
                                             <option value="assigned" {{ $trip->status == 'assigned' ? 'selected' : '' }}>
                                                 Ditugaskan
                                             </option>
@@ -128,28 +113,30 @@
                                                 Diantar
                                             </option>
 
+                                            <option value="completed" {{ $trip->status == 'completed' ? 'selected' : '' }}>
+                                                Selesai
+                                            </option>
                                         </select>
 
-                                        <button class="btn btn-primary btn-sm w-100">
-                                            Update Status
+                                        <button type="submit" class="btn btn-primary-custom">
+                                            Update
                                         </button>
-
                                     </form>
-
                                 </td>
-
                             </tr>
 
-                        @endforeach
-
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    Belum ada tugas sopir
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
-
                 </table>
-
             </div>
 
         </div>
-
     </div>
 
 @endsection

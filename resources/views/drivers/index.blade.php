@@ -2,26 +2,34 @@
 
 @section('content')
 
-    <h3 class="mb-3">
-        Data Driver
-    </h3>
+    <div class="section-header">
+        <div>
+            <div class="page-title">Data Sopir</div>
+            <div class="page-subtitle">
+                Kelola data sopir, kendaraan, plat nomor, dan status ketersediaan
+            </div>
+        </div>
 
-    <a href="/admin/drivers/create" class="btn btn-primary mb-3">
+        <div class="header-actions">
+            <a href="/admin/drivers/create" class="btn btn-primary-custom">
+                <i class="bi bi-plus-circle"></i>
+                Tambah Sopir
+            </a>
+        </div>
+    </div>
 
-        + Tambah Driver
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
 
-    </a>
-
-    <div class="card">
-
+    <div class="page-card">
         <div class="card-body">
 
             <div class="table-responsive">
-
-                <table class="table table-bordered table-striped align-middle">
-
-                    <thead class="table-dark">
-
+                <table class="custom-table">
+                    <thead>
                         <tr>
                             <th>No</th>
                             <th>Nama</th>
@@ -29,100 +37,81 @@
                             <th>Kendaraan</th>
                             <th>Plat</th>
                             <th>Status</th>
-                            <th width="180">Aksi</th>
+                            <th style="width: 160px;">Aksi</th>
                         </tr>
-
                     </thead>
 
                     <tbody>
-
-                        @foreach($drivers as $driver)
-
+                        @forelse($drivers as $driver)
                             <tr>
+                                <td>{{ $loop->iteration }}</td>
 
                                 <td>
-                                    {{ $loop->iteration }}
+                                    <div class="fw-bold">
+                                        {{ $driver->user->name ?? '-' }}
+                                    </div>
+                                </td>
+
+                                <td>{{ $driver->user->email ?? '-' }}</td>
+
+                                <td>{{ $driver->vehicle_type }}</td>
+
+                                <td>
+                                    <span class="package-badge">
+                                        {{ $driver->plate_number }}
+                                    </span>
                                 </td>
 
                                 <td>
-                                    {{ $driver->user->name }}
-                                </td>
-
-                                <td>
-                                    {{ $driver->user->email }}
-                                </td>
-
-                                <td>
-                                    {{ $driver->vehicle_type }}
-                                </td>
-
-                                <td>
-                                    {{ $driver->plate_number }}
-                                </td>
-
-                                <td>
-
                                     @if($driver->status == 'online')
-
-                                        <span class="badge rounded-pill bg-success px-3 py-2">
-                                            🟢 Online
+                                        <span class="badge-status badge-active">
+                                            Online
                                         </span>
-
                                     @else
-
-                                        <span class="badge rounded-pill bg-danger px-3 py-2">
-                                            🔴 Offline
+                                        <span class="badge-status badge-danger">
+                                            Offline
                                         </span>
-
                                     @endif
-
                                 </td>
+
                                 <td>
+                                    <div class="icon-action-group">
 
-                                    <div class="d-flex gap-2 flex-wrap">
-
-                                        <a href="/admin/drivers/{{ $driver->id }}/edit" class="btn btn-warning btn-sm">
-
-                                            <i class="bi bi-pencil-square"></i>
-
+                                        <a href="/admin/drivers/{{ $driver->id }}/edit" class="icon-btn icon-btn-warning"
+                                            title="Edit Sopir">
+                                            <i class="bi bi-pencil-fill"></i>
                                         </a>
 
-                                        <a href="/admin/drivers/{{ $driver->id }}/history" class="btn btn-info btn-sm">
-
+                                        <a href="/admin/drivers/{{ $driver->id }}/history" class="icon-btn icon-btn-info"
+                                            title="Riwayat Sopir">
                                             <i class="bi bi-clock-history"></i>
-
                                         </a>
 
                                         <form action="/admin/drivers/{{ $driver->id }}" method="POST">
-
                                             @csrf
                                             @method('DELETE')
 
-                                            <button class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Yakin hapus driver?')">
-
-                                                <i class="bi bi-trash"></i>
-
+                                            <button type="submit" class="icon-btn icon-btn-danger"
+                                                onclick="return confirm('Yakin hapus sopir?')" title="Hapus Sopir">
+                                                <i class="bi bi-trash-fill"></i>
                                             </button>
-
                                         </form>
 
                                     </div>
-
                                 </td>
-
                             </tr>
-
-                        @endforeach
-
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    Belum ada data sopir
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
-
                 </table>
-
             </div>
 
         </div>
-
     </div>
 
 @endsection

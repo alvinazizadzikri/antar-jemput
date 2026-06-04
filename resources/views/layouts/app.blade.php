@@ -2,290 +2,204 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antar Jemput</title>
 
-    <!-- Bootstrap -->
-    <!-- LEAFLET CSS -->
+    {{-- Bootstrap --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    {{-- Bootstrap Icons --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    {{-- Leaflet CSS untuk Map --}}
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Icon -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <style>
-        body {
-            background: #f4f7fb;
-            font-family: 'Segoe UI', sans-serif;
-            color: #2c3e50;
-        }
-
-        .sidebar {
-            width: 260px;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: white;
-            border-right: 1px solid #e9ecef;
-            padding: 25px 18px;
-            overflow-y: auto;
-        }
-
-        .brand {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 30px;
-            color: #4e73df;
-        }
-
-        .sidebar .nav-link {
-            color: #34495e;
-            padding: 12px 15px;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-
-        .sidebar .nav-link:hover {
-            background: #edf2ff;
-            color: #4e73df;
-        }
-
-        .sidebar .nav-link.active {
-            background: #4e73df;
-            color: white;
-        }
-
-        .sidebar .nav-link i {
-            margin-right: 10px;
-        }
-
-        .main {
-            margin-left: 260px;
-            min-height: 100vh;
-        }
-
-        .topbar {
-            background: white;
-            padding: 18px 30px;
-            border-bottom: 1px solid #e9ecef;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .topbar-title {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .card {
-            border: none;
-            border-radius: 18px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-        }
-
-        .table {
-            vertical-align: middle;
-        }
-
-        @media(max-width:992px) {
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-
-            .main {
-                margin-left: 0;
-            }
-
-        }
-    </style>
-
+    {{-- Theme Global --}}
+    <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
 </head>
 
 <body>
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
+    <div class="app-shell">
 
-        <div class="brand">
-            Antar Jemput
-        </div>
+        {{-- SIDEBAR --}}
+        <aside class="sidebar">
 
-        <ul class="nav flex-column">
+            <div class="sidebar-brand">
+                Antar Jemput
+            </div>
 
-            {{-- DASHBOARD --}}
-            <li class="nav-item">
-                <a href="/dashboard" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-grid"></i>
-                    Dashboard
-                </a>
-            </li>
+            <ul class="nav flex-column">
 
-            {{-- PARENT --}}
-            @if(auth()->user()->role == 'parent')
-
+                {{-- DASHBOARD --}}
                 <li class="nav-item">
-                    <a href="/kids" class="nav-link {{ request()->is('kids*') ? 'active' : '' }}">
-                        <i class="bi bi-people"></i>
-                        Data Anak
+                    <a href="/dashboard" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
+                        <i class="bi bi-grid"></i>
+                        Dashboard
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a href="/subscriptions" class="nav-link {{ request()->is('subscriptions*') ? 'active' : '' }}">
-                        <i class="bi bi-credit-card-fill"></i>
-                        Langganan
-                    </a>
-                </li>
+                {{-- MENU PARENT / ORANG TUA --}}
+                @if(auth()->user()->role == 'parent')
 
-            @endif
+                    <li class="nav-item">
+                        <a href="/kids" class="nav-link {{ request()->is('kids*') ? 'active' : '' }}">
+                            <i class="bi bi-people"></i>
+                            Data Anak
+                        </a>
+                    </li>
 
-            {{-- ADMIN --}}
-            @if(auth()->user()->role == 'admin')
+                    <li class="nav-item">
+                        <a href="/subscriptions" class="nav-link {{ request()->is('subscriptions*') ? 'active' : '' }}">
+                            <i class="bi bi-credit-card-fill"></i>
+                            Langganan
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a href="/admin/drivers" class="nav-link {{ request()->is('admin/drivers*') ? 'active' : '' }}">
-                        <i class="bi bi-truck"></i>
-                        Data Sopir
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a href="/riwayat" class="nav-link {{ request()->is('riwayat*') ? 'active' : '' }}">
+                            <i class="bi bi-clock-history"></i>
+                            Riwayat Antar Jemput
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a href="/admin/trips/create"
-                        class="nav-link {{ request()->is('admin/trips/create') ? 'active' : '' }}">
-                        <i class="bi bi-person-check"></i>
-                        Penugasan Sopir
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="/admin/trips" class="nav-link {{ request()->is('admin/trips') ? 'active' : '' }}">
-                        <i class="bi bi-clock-history"></i>
-                        Riwayat Perjalanan
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="/admin/transaksi" class="nav-link {{ request()->is('admin/transaksi*') ? 'active' : '' }}">
-                        <i class="bi bi-receipt"></i>
-                        Transaksi
-                    </a>
-                </li>
-
-            @endif
-
-            {{-- DRIVER --}}
-            @if(auth()->user()->role == 'driver')
-
-                <li class="nav-item">
-                    <a href="/driver/jobs" class="nav-link {{ request()->is('driver/jobs*') ? 'active' : '' }}">
-                        <i class="bi bi-bag-check"></i>
-                        Tugas Sopir
-                    </a>
-                </li>
-
-            @endif
-
-            {{-- RIWAYAT ANTAR JEMPUT UNTUK USER / ORANG TUA --}}
-            @if(auth()->user()->role == 'parent')
-
-                <li class="nav-item">
-                    <a href="/riwayat" class="nav-link {{ request()->is('riwayat*') ? 'active' : '' }}">
-                        <i class="bi bi-clock-history"></i>
-                        Riwayat Antar Jemput
-                    </a>
-                </li>
-
-            @endif
-
-            {{-- PROFIL --}}
-            <li class="nav-item">
-                <a href="/profile" class="nav-link {{ request()->is('profile') ? 'active' : '' }}">
-                    <i class="bi bi-person-circle"></i>
-                    Profil
-                </a>
-            </li>
-
-        </ul>
-
-    </div>
-
-    <!-- MAIN -->
-    <div class="main">
-
-        <!-- TOPBAR -->
-        <div class="topbar">
-
-            <div class="topbar-title">
-
-                @if(request()->is('admin/drivers*'))
-                    Data Sopir
-
-                @elseif(request()->is('admin/trips/create'))
-                    Penugasan Sopir
-
-                @elseif(request()->is('admin/trips*'))
-                    Penugasan Sopir
-
-                @elseif(request()->is('driver/jobs*'))
-                    Tugas Sopir
-
-                @elseif(request()->is('kids*'))
-                    Data Anak
-
-                @elseif(request()->is('subscriptions*'))
-                    Langganan
-
-                @elseif(request()->is('admin/transaksi*'))
-                    Transaksi
-
-                @elseif(request()->is('profile'))
-                    Profil
-
-                @else
-                    Dashboard
                 @endif
 
+                {{-- MENU ADMIN --}}
+                @if(auth()->user()->role == 'admin')
+
+                    <li class="nav-item">
+                        <a href="/admin/drivers" class="nav-link {{ request()->is('admin/drivers*') ? 'active' : '' }}">
+                            <i class="bi bi-truck"></i>
+                            Data Sopir
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/admin/trips/create"
+                            class="nav-link {{ request()->is('admin/trips/create') ? 'active' : '' }}">
+                            <i class="bi bi-person-check"></i>
+                            Penugasan Sopir
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/admin/trips" class="nav-link {{ request()->is('admin/trips') ? 'active' : '' }}">
+                            <i class="bi bi-clock-history"></i>
+                            Riwayat Perjalanan
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/admin/transaksi" class="nav-link {{ request()->is('admin/transaksi*') ? 'active' : '' }}">
+                            <i class="bi bi-receipt"></i>
+                            Transaksi
+                        </a>
+                    </li>
+
+                @endif
+
+                {{-- MENU SOPIR / DRIVER --}}
+                @if(auth()->user()->role == 'driver')
+
+                    <li class="nav-item">
+                        <a href="/driver/jobs" class="nav-link {{ request()->is('driver/jobs*') ? 'active' : '' }}">
+                            <i class="bi bi-bag-check"></i>
+                            Tugas Sopir
+                        </a>
+                    </li>
+
+                @endif
+
+                {{-- PROFIL --}}
+                <li class="nav-item">
+                    <a href="/profile" class="nav-link {{ request()->is('profile') ? 'active' : '' }}">
+                        <i class="bi bi-person-circle"></i>
+                        Profil
+                    </a>
+                </li>
+
+            </ul>
+
+        </aside>
+
+        {{-- MAIN CONTENT --}}
+        <main class="main-content flex-grow-1">
+
+            {{-- TOPBAR --}}
+            <div class="topbar d-flex justify-content-between align-items-center">
+
+                <div class="topbar-title">
+
+                    @if(request()->is('dashboard'))
+                        Dashboard
+
+                    @elseif(request()->is('kids*'))
+                        Data Anak
+
+                    @elseif(request()->is('subscriptions/*/payment'))
+                        Pembayaran
+
+                    @elseif(request()->is('subscriptions*'))
+                        Langganan
+
+                    @elseif(request()->is('riwayat*'))
+                        Riwayat Antar Jemput
+
+                    @elseif(request()->is('admin/drivers*'))
+                        Data Sopir
+
+                    @elseif(request()->is('admin/trips/create'))
+                        Penugasan Sopir
+
+                    @elseif(request()->is('admin/trips'))
+                        Riwayat Perjalanan
+
+                    @elseif(request()->is('admin/transaksi*'))
+                        Transaksi
+
+                    @elseif(request()->is('driver/jobs*'))
+                        Tugas Sopir
+
+                    @elseif(request()->is('profile'))
+                        Profil
+
+                    @else
+                        Antar Jemput
+                    @endif
+
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <span class="fw-semibold">
+                        {{ auth()->user()->name ?? 'User' }}
+                    </span>
+
+                    <a href="/logout" class="btn btn-danger-custom btn-sm">
+                        Logout
+                    </a>
+
+                </div>
+
             </div>
 
-            <div class="d-flex align-items-center gap-3">
-
-                <span>
-                    {{ auth()->user()->name }}
-                </span>
-
-                <a href="/logout" class="btn btn-danger btn-sm">
-
-                    Logout
-
-                </a>
-
+            {{-- ISI HALAMAN --}}
+            <div class="page-wrapper">
+                @yield('content')
             </div>
 
-        </div>
-
-        <!-- CONTENT -->
-        <div class="content">
-
-            @yield('content')
-
-        </div>
+        </main>
 
     </div>
-    <!-- LEAFLET JS -->
+
+    {{-- Bootstrap JS --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {{-- Leaflet JS untuk Map --}}
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 </body>
 
 </html>

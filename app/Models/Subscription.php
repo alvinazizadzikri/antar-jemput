@@ -32,4 +32,14 @@ class Subscription extends Model
     {
         return $this->belongsTo(Kid::class);
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function latestTransaction()
+    {
+        return $this->hasOne(Transaction::class)->latestOfMany();
+    }
 }

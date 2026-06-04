@@ -2,72 +2,75 @@
 
 @section('content')
 
-    <h3 class="mb-3">
-        Edit Driver
-    </h3>
+    <div class="section-header">
+        <div>
+            <div class="page-title">Edit Sopir</div>
+            <div class="page-subtitle">
+                Perbarui data kendaraan dan status sopir
+            </div>
+        </div>
+    </div>
 
-    <div class="card">
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <strong>Terjadi kesalahan!</strong>
+            <ul class="mb-0 mt-2">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-        <div class="card-body">
+    <div class="form-card">
 
-            <form action="/admin/drivers/{{ $driver->id }}" method="POST">
+        <div class="form-section-title">
+            Form Edit Sopir
+        </div>
 
-                @csrf
-                @method('PUT')
+        <form action="/admin/drivers/{{ $driver->id }}" method="POST">
+            @csrf
+            @method('PUT')
 
-                <div class="mb-3">
+            <div class="mb-3">
+                <label class="form-label">Jenis Kendaraan</label>
 
-                    <label>
-                        Jenis Kendaraan
-                    </label>
+                <input type="text" name="vehicle_type" class="form-control"
+                    value="{{ old('vehicle_type', $driver->vehicle_type) }}" required>
+            </div>
 
-                    <input type="text" name="vehicle_type" class="form-control" value="{{ $driver->vehicle_type }}">
+            <div class="mb-3">
+                <label class="form-label">Plat Nomor</label>
 
-                </div>
+                <input type="text" name="plate_number" class="form-control"
+                    value="{{ old('plate_number', $driver->plate_number) }}" required>
+            </div>
 
-                <div class="mb-3">
+            <div class="mb-4">
+                <label class="form-label">Status</label>
 
-                    <label>
-                        Plat Nomor
-                    </label>
+                <select name="status" class="form-select" required>
+                    <option value="online" {{ $driver->status == 'online' ? 'selected' : '' }}>
+                        Online
+                    </option>
 
-                    <input type="text" name="plate_number" class="form-control" value="{{ $driver->plate_number }}">
+                    <option value="offline" {{ $driver->status == 'offline' ? 'selected' : '' }}>
+                        Offline
+                    </option>
+                </select>
+            </div>
 
-                </div>
-
-                <div class="mb-3">
-
-                    <label>
-                        Status
-                    </label>
-
-                    <select name="status" class="form-control">
-
-                        <option value="online" {{ $driver->status == 'online' ? 'selected' : '' }}>
-
-                            Online
-
-                        </option>
-
-                        <option value="offline" {{ $driver->status == 'offline' ? 'selected' : '' }}>
-
-                            Offline
-
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <button class="btn btn-primary">
-
+            <div class="form-action-row">
+                <button class="btn btn-primary-custom">
+                    <i class="bi bi-save"></i>
                     Update
-
                 </button>
 
-            </form>
-
-        </div>
+                <a href="/admin/drivers" class="btn btn-secondary-custom">
+                    Kembali
+                </a>
+            </div>
+        </form>
 
     </div>
 

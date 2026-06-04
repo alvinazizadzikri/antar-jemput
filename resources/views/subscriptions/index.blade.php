@@ -2,214 +2,175 @@
 
 @section('content')
 
-    <div class="container">
-
-        {{-- HEADER --}}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-
-            <div>
-                <h3 class="fw-bold mb-1">
-                    Langganan Saya
-                </h3>
-
-                <small class="text-muted">
-                    Kelola paket antar jemput anak
-                </small>
+    <div class="section-header">
+        <div>
+            <div class="page-title">Langganan Saya</div>
+            <div class="page-subtitle">
+                Status langganan antar jemput berdasarkan data anak
             </div>
+        </div>
 
-            <a href="{{ route('subscriptions.create') }}" class="btn btn-primary">
-
+        <div class="header-actions">
+            <a href="{{ route('subscriptions.create') }}" class="btn btn-primary-custom">
                 <i class="bi bi-plus-circle"></i>
                 Tambah Langganan
-
             </a>
-
         </div>
+    </div>
 
-        {{-- ALERT --}}
-        @if(session('success'))
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
-            <div class="alert alert-success alert-dismissible fade show">
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
-                {{ session('success') }}
+    <div class="page-card">
+        <div class="card-body">
 
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Anak</th>
+                            <th>Sekolah</th>
+                            <th>Paket</th>
+                            <th>Harga</th>
+                            <th>Pembayaran</th>
+                            <th>Status</th>
+                            <th>Masa Berlaku</th>
+                            <th style="width: 170px;">Aksi</th>
+                        </tr>
+                    </thead>
 
-            </div>
+                    <tbody>
+                        @forelse($kids as $kid)
 
-        @endif
-
-        {{-- CARD --}}
-        <div class="card shadow border-0">
-
-            <div class="card-body">
-
-                <div class="table-responsive">
-
-                    <table class="table align-middle table-hover">
-
-                        <thead class="table-light">
+                            @php
+                                $subscription = $kid->activeSubscription ?? $kid->latestSubscription;
+                            @endphp
 
                             <tr>
+                                <td>
+                                    <div class="fw-bold">
+                                        {{ $kid->name }}
+                                    </div>
+                                </td>
 
-                                <th>Anak</th>
-                                <th>Paket</th>
-                                <th>Harga</th>
-                                <th>Pembayaran</th>
-                                <th>Status</th>
-                                <th>Sisa Hari</th>
-                                <th>Tanggal</th>
+                                <td>
+                                    {{ $kid->school_name }}
+                                </td>
 
+                                <td>
+                                    @if($subscription)
+                                        <span class="package-badge">
+                                            {{ $subscription->package_name }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if($subscription)
+                                        Rp {{ number_format($subscription->price, 0, ',', '.') }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if($subscription)
+                                        {{ $subscription->payment_method ?? 'QRIS' }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if(!$subscription)
+                                        <span class="badge-status badge-neutral">
+                                            Belum Langganan
+                                        </span>
+                                    @elseif($subscription->status == 'pending')
+                                        <span class="badge-status badge-pending">
+                                            Menunggu Pembayaran
+                                        </span>
+                                    @elseif($subscription->status == 'active')
+                                        <span class="badge-status badge-active">
+                                            Aktif
+                                        </span>
+                                    @elseif($subscription->status == 'paid')
+                                        <span class="badge-status badge-assigned">
+                                            Dibayar
+                                        </span>
+                                    @else
+                                        <span class="badge-status badge-danger">
+                                            Expired
+                                        </span>
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if($subscription && $subscription->status == 'active')
+                                        <small>
+                                            {{ \Carbon\Carbon::parse($subscription->start_date)->format('d M Y') }}
+                                            -
+                                            {{ \Carbon\Carbon::parse($subscription->end_date)->format('d M Y') }}
+                                        </small>
+                                    @elseif($subscription && $subscription->status == 'pending')
+                                        <small class="text-muted">
+                                            Belum aktif
+                                        </small>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if(!$subscription || $subscription->status == 'expired')
+                                        <a href="{{ route('subscriptions.create') }}?kid_id={{ $kid->id }}"
+                                            class="btn btn-primary-custom btn-sm">
+                                            Pilih Paket
+                                        </a>
+                                    @elseif($subscription->status == 'pending')
+                                        <a href="{{ route('subscriptions.payment', $subscription->id) }}"
+                                            class="btn btn-warning-custom btn-sm">
+                                            Bayar Sekarang
+                                        </a>
+                                    @elseif($subscription->status == 'active')
+                                        <span class="fw-bold text-success">
+                                            Aktif
+                                        </span>
+                                    @else
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+                                    @endif
+                                </td>
                             </tr>
 
-                        </thead>
-
-                        <tbody>
-
-                            @forelse($subscriptions as $subscription)
-
-                                <tr>
-
-                                    {{-- NAMA ANAK --}}
-                                    <td>
-
-                                        <div class="fw-semibold">
-                                            {{ $subscription->kid->name ?? '-' }}
-                                        </div>
-
-                                    </td>
-
-                                    {{-- PAKET --}}
-                                    <td>
-
-                                        <span class="badge bg-primary">
-
-                                            {{ $subscription->package_name }}
-
-                                        </span>
-
-                                    </td>
-
-                                    {{-- HARGA --}}
-                                    <td>
-
-                                        Rp {{ number_format($subscription->price, 0, ',', '.') }}
-
-                                    </td>
-
-                                    {{-- PEMBAYARAN --}}
-                                    <td>
-
-                                        {{ $subscription->payment_method }}
-
-                                    </td>
-
-                                    {{-- STATUS --}}
-                                    <td>
-
-                                        @if($subscription->is_paused)
-
-                                            <span class="badge bg-secondary">
-
-                                                Dipause
-
-                                            </span>
-
-                                        @elseif($subscription->status == 'pending')
-
-                                            <span class="badge bg-warning text-dark">
-
-                                                Pending
-
-                                            </span>
-
-                                        @elseif($subscription->status == 'paid')
-
-                                            <span class="badge bg-info">
-
-                                                Dibayar
-
-                                            </span>
-
-                                        @elseif($subscription->status == 'active')
-
-                                            <span class="badge bg-success">
-
-                                                Aktif
-
-                                            </span>
-
-                                        @else
-
-                                            <span class="badge bg-danger">
-
-                                                Expired
-
-                                            </span>
-
-                                        @endif
-
-                                    </td>
-
-                                    {{-- SISA HARI --}}
-                                    <td>
-
-                                        @if($subscription->is_paused)
-
-                                            <span class="text-warning fw-bold">
-
-                                                {{ $subscription->remaining_days }} Hari
-
-                                            </span>
-
-                                        @else
-
-                                            -
-
-                                        @endif
-
-                                    </td>
-
-                                    {{-- TANGGAL --}}
-                                    <td>
-
-                                        <small>
-
-                                            {{ $subscription->created_at->format('d M Y') }}
-
-                                        </small>
-
-                                    </td>
-
-
-                                </tr>
-
-                            @empty
-
-                                <tr>
-
-                                    <td colspan="7" class="text-center text-muted py-5">
-
-                                        <i class="bi bi-credit-card fs-1 d-block mb-2"></i>
-
-                                        Belum ada langganan
-
-                                    </td>
-
-                                </tr>
-
-                            @endforelse
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="bi bi-people fs-1 d-block mb-2"></i>
+                                    Belum ada data anak.
+                                    Silakan tambahkan data anak terlebih dahulu.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
 
         </div>
-
     </div>
 
 @endsection

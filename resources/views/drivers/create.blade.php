@@ -2,119 +2,81 @@
 
 @section('content')
 
-    <h3 class="mb-3">
-        Tambah Driver
-    </h3>
-
-    @if ($errors->any())
-
-        <div class="alert alert-danger">
-
-            <ul class="mb-0">
-
-                @foreach ($errors->all() as $error)
-
-                    <li>{{ $error }}</li>
-
-                @endforeach
-
-            </ul>
-
+    <div class="section-header">
+        <div>
+            <div class="page-title">Tambah Sopir</div>
+            <div class="page-subtitle">
+                Tambahkan data sopir dan informasi kendaraan
+            </div>
         </div>
+    </div>
 
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <strong>Terjadi kesalahan!</strong>
+            <ul class="mb-0 mt-2">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
-    <div class="card">
+    <div class="form-card">
 
-        <div class="card-body">
+        <div class="form-section-title">
+            Form Tambah Sopir
+        </div>
 
-            <form action="/admin/drivers" method="POST">
+        <form action="/admin/drivers" method="POST">
+            @csrf
 
-                @csrf
+            <div class="mb-3">
+                <label class="form-label">User Sopir</label>
 
-                <div class="mb-3">
+                <select name="user_id" class="form-select" required>
+                    <option value="">-- Pilih Sopir --</option>
 
-                    <label class="form-label">
-                        User Driver
-                    </label>
-
-                    <select name="user_id" class="form-control" required>
-
-                        <option value="">
-                            -- Pilih Driver --
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}">
+                            {{ $user->name }} - {{ $user->email }}
                         </option>
+                    @endforeach
+                </select>
+            </div>
 
-                        @foreach($users as $user)
+            <div class="mb-3">
+                <label class="form-label">Jenis Kendaraan</label>
 
-                            <option value="{{ $user->id }}">
+                <input type="text" name="vehicle_type" class="form-control" placeholder="Contoh: Mobil" required>
+            </div>
 
-                                {{ $user->name }}
-                                -
-                                {{ $user->email }}
+            <div class="mb-3">
+                <label class="form-label">Plat Nomor</label>
 
-                            </option>
+                <input type="text" name="plate_number" class="form-control" placeholder="Contoh: B 1234 ABC" required>
+            </div>
 
-                        @endforeach
+            <div class="mb-4">
+                <label class="form-label">Status</label>
 
-                    </select>
+                <select name="status" class="form-select" required>
+                    <option value="online">Online</option>
+                    <option value="offline">Offline</option>
+                </select>
+            </div>
 
-                </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-                        Jenis Kendaraan
-                    </label>
-
-                    <input type="text" name="vehicle_type" class="form-control" placeholder="Contoh: Mobil" required>
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-                        Plat Nomor
-                    </label>
-
-                    <input type="text" name="plate_number" class="form-control" placeholder="Contoh: B 1234 ABC" required>
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-                        Status
-                    </label>
-
-                    <select name="status" class="form-control">
-
-                        <option value="online">
-                            Online
-                        </option>
-
-                        <option value="offline">
-                            Offline
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <button class="btn btn-primary">
-
+            <div class="form-action-row">
+                <button class="btn btn-primary-custom">
+                    <i class="bi bi-save"></i>
                     Simpan
-
                 </button>
 
-                <a href="/admin/drivers" class="btn btn-secondary">
-
+                <a href="/admin/drivers" class="btn btn-secondary-custom">
                     Kembali
-
                 </a>
-
-            </form>
-
-        </div>
+            </div>
+        </form>
 
     </div>
 
