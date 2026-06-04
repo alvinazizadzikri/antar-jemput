@@ -36,7 +36,7 @@ class RiwayatAntarJemputController extends Controller
 
             'kid_id' => $request->kid_id,
             'driver_id' => $request->driver_id,
-            'pickup_time' => $request->pickup_time,
+            'pickup_time' => now()->format('Y-m-d') . ' ' . $request->pickup_time . ':00',
             'status' => $request->status,
 
         ]);
