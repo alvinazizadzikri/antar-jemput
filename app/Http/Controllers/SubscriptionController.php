@@ -80,7 +80,7 @@ class SubscriptionController extends Controller
 
             'price' => $prices[$request->package_name],
 
-            'status' => 'active',
+            'status' => 'pending',
 
             'payment_method' => 'QRIS',
 
@@ -100,85 +100,38 @@ class SubscriptionController extends Controller
             ->with('success', 'Langganan berhasil dibuat');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | PAUSE SUBSCRIPTION
-    |--------------------------------------------------------------------------
-    */
-    public function pause($id)
+
+    public function adminTransaksi()
     {
-        $subscription = Subscription::findOrFail($id);
+        $subscriptions = Subscription::with([
+            'user',
+            'kid',
+        ])
+            ->latest()
+            ->get();
 
-        /*
-        |--------------------------------------------------------------------------
-        | HITUNG SISA HARI
-        |--------------------------------------------------------------------------
-        */
-        $today = Carbon::today();
-
-        $remaining = $today->diffInDays(
-            Carbon::parse($subscription->end_date),
-            false
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE STATUS
-        |--------------------------------------------------------------------------
-        */
-        $subscription->update([
-
-            'is_paused' => true,
-
-            'pause_start' => now(),
-
-            'remaining_days' => $remaining,
-
-            'pause_reason' => 'Anak sakit',
-
-        ]);
-
-        return back()->with(
-            'success',
-            'Langganan berhasil dipause'
-        );
+        return view('transaksi.index', compact('subscriptions'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | RESUME SUBSCRIPTION
-    |--------------------------------------------------------------------------
-    */
-    public function resume($id)
+    public function verifikasiPembayaran($id)
     {
         $subscription = Subscription::findOrFail($id);
 
-        /*
-        |--------------------------------------------------------------------------
-        | BUAT TANGGAL AKHIR BARU
-        |--------------------------------------------------------------------------
-        */
-        $newEndDate = Carbon::today()
-            ->addDays($subscription->remaining_days);
+        $durations = [
+            'Harian' => 1,
+            'Mingguan' => 7,
+            'Bulanan' => 30,
+        ];
 
-        /*
-        |--------------------------------------------------------------------------
-        | UPDATE
-        |--------------------------------------------------------------------------
-        */
+        $duration = $durations[$subscription->package_name] ?? 1;
+
         $subscription->update([
-
-            'is_paused' => false,
-
-            'pause_end' => now(),
-
-            'end_date' => $newEndDate,
-
+            'status' => 'active',
+            'payment_method' => 'QRIS',
+            'start_date' => Carbon::today(),
+            'end_date' => Carbon::today()->addDays($duration),
         ]);
 
-        return back()->with(
-            'success',
-            'Langganan kembali aktif'
-        );
+        return back()->with('success', 'Pembayaran berhasil diverifikasi');
     }
 }

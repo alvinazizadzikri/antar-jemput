@@ -36,7 +36,7 @@ class RiwayatAntarJemputController extends Controller
 
             'kid_id' => $request->kid_id,
             'driver_id' => $request->driver_id,
-            'pickup_time' => now()->format('Y-m-d') . ' ' . $request->pickup_time . ':00',
+            'pickup_time' => now()->format('Y-m-d').' '.$request->pickup_time.':00',
             'status' => $request->status,
 
         ]);
@@ -49,8 +49,11 @@ class RiwayatAntarJemputController extends Controller
     {
         $trips = RiwayatAntarJemput::with([
             'driver.user',
-            'kid',
-        ])->get();
+            'kid.parent',
+            'kid.subscription',
+        ])
+            ->latest()
+            ->get();
 
         return view('trips.index', compact('trips'));
     }
@@ -121,5 +124,33 @@ class RiwayatAntarJemputController extends Controller
         ])->findOrFail($id);
 
         return view('trips.show', compact('trip'));
+    }
+
+    public function parentHistory()
+    {
+        $trips = RiwayatAntarJemput::with([
+            'kid',
+            'driver.user',
+        ])
+            ->whereHas('kid', function ($query) {
+                $query->where('parent_id', auth()->id());
+            })
+            ->latest()
+            ->get();
+
+        return view('riwayat.index', compact('trips'));
+    }
+
+    public function adminHistory()
+    {
+        $trips = RiwayatAntarJemput::with([
+            'kid.parent',
+            'kid.subscription',
+            'driver.user',
+        ])
+            ->latest()
+            ->get();
+
+        return view('admin_riwayat.index', compact('trips'));
     }
 }

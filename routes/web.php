@@ -1,18 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\KidController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\KidController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatAntarJemputController;
 use App\Http\Controllers\SubscriptionController;
-use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
-
 
 // =======================
 // AUTH
@@ -29,15 +28,12 @@ Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/logout', [AuthController::class, 'logout']);
 
-
 // =======================
 // DASHBOARD
 // =======================
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware('auth');
-
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('auth');
 
 // =======================
 // KIDS
@@ -45,7 +41,6 @@ Route::get('/dashboard', function () {
 
 Route::resource('kids', KidController::class)
     ->middleware('auth');
-
 
 // =======================
 // PROFILE
@@ -57,7 +52,6 @@ Route::get('/profile', [ProfileController::class, 'index'])
 Route::post('/profile', [ProfileController::class, 'update'])
     ->middleware('auth');
 
-
 // =======================
 // SUBSCRIPTIONS
 // =======================
@@ -65,16 +59,9 @@ Route::post('/profile', [ProfileController::class, 'update'])
 Route::resource('subscriptions', SubscriptionController::class)
     ->middleware('auth');
 
-Route::post(
-    '/subscriptions/{id}/pause',
-    [SubscriptionController::class, 'pause']
-)->name('subscriptions.pause');
-
-Route::post(
-    '/subscriptions/{id}/resume',
-    [SubscriptionController::class, 'resume']
-)->name('subscriptions.resume');
-
+Route::get('/riwayat', [RiwayatAntarJemputController::class, 'parentHistory'])
+    ->middleware('auth')
+    ->name('riwayat.parent');
 
 // =======================
 // ADMIN
@@ -87,8 +74,18 @@ Route::middleware(['auth'])
         // DRIVER
         Route::resource('drivers', DriverController::class);
 
-        // ASSIGN DRIVER / TRIP
+        // ASSIGN DRIVER DAN RIWAYAT PERJALANAN
         Route::resource('trips', RiwayatAntarJemputController::class);
+
+        Route::get(
+            '/transaksi',
+            [SubscriptionController::class, 'adminTransaksi']
+        )->name('admin.transaksi');
+
+        Route::post(
+            '/transaksi/{id}/verifikasi',
+            [SubscriptionController::class, 'verifikasiPembayaran']
+        )->name('admin.transaksi.verifikasi');
 
         // HISTORY DRIVER
         Route::get(
@@ -97,8 +94,6 @@ Route::middleware(['auth'])
         );
 
     });
-
-
 // =======================
 // DRIVER
 // =======================

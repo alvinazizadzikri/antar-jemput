@@ -158,14 +158,29 @@
                 <li class="nav-item">
                     <a href="/admin/drivers" class="nav-link {{ request()->is('admin/drivers*') ? 'active' : '' }}">
                         <i class="bi bi-truck"></i>
-                        Driver
+                        Data Sopir
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="/admin/trips" class="nav-link {{ request()->is('admin/trips*') ? 'active' : '' }}">
+                    <a href="/admin/trips/create"
+                        class="nav-link {{ request()->is('admin/trips/create') ? 'active' : '' }}">
                         <i class="bi bi-person-check"></i>
-                        Assign Driver
+                        Penugasan Sopir
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="/admin/trips" class="nav-link {{ request()->is('admin/trips') ? 'active' : '' }}">
+                        <i class="bi bi-clock-history"></i>
+                        Riwayat Perjalanan
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="/admin/transaksi" class="nav-link {{ request()->is('admin/transaksi*') ? 'active' : '' }}">
+                        <i class="bi bi-receipt"></i>
+                        Transaksi
                     </a>
                 </li>
 
@@ -177,7 +192,19 @@
                 <li class="nav-item">
                     <a href="/driver/jobs" class="nav-link {{ request()->is('driver/jobs*') ? 'active' : '' }}">
                         <i class="bi bi-bag-check"></i>
-                        Job Driver
+                        Tugas Sopir
+                    </a>
+                </li>
+
+            @endif
+
+            {{-- RIWAYAT ANTAR JEMPUT UNTUK USER / ORANG TUA --}}
+            @if(auth()->user()->role == 'parent')
+
+                <li class="nav-item">
+                    <a href="/riwayat" class="nav-link {{ request()->is('riwayat*') ? 'active' : '' }}">
+                        <i class="bi bi-clock-history"></i>
+                        Riwayat Antar Jemput
                     </a>
                 </li>
 
@@ -204,22 +231,25 @@
             <div class="topbar-title">
 
                 @if(request()->is('admin/drivers*'))
-                    Driver
+                    Data Sopir
 
                 @elseif(request()->is('admin/trips/create'))
-                    Assign Driver
+                    Penugasan Sopir
 
                 @elseif(request()->is('admin/trips*'))
-                    Riwayat Trip
+                    Penugasan Sopir
 
                 @elseif(request()->is('driver/jobs*'))
-                    Job Driver
+                    Tugas Sopir
 
                 @elseif(request()->is('kids*'))
                     Data Anak
 
                 @elseif(request()->is('subscriptions*'))
                     Langganan
+
+                @elseif(request()->is('admin/transaksi*'))
+                    Transaksi
 
                 @elseif(request()->is('profile'))
                     Profil

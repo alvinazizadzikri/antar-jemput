@@ -1,122 +1,88 @@
 @extends('layouts.app')
 
+@section('title', 'Riwayat Perjalanan')
+
 @section('content')
+    <div class="container-fluid">
 
-    <h3 class="mb-3">
-        Data Trip
-    </h3>
+        <h3 class="fw-bold">Riwayat Perjalanan</h3>
+        <p class="text-muted">Data seluruh perjalanan antar jemput anak</p>
 
-    @if(session('success'))
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
 
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-
-    @endif
-
-    <a href="/admin/trips/create" class="btn btn-primary mb-3">
-
-        + Assign Driver
-
-    </a>
-
-    <div class="card">
-
-        <div class="card-body">
-
-            <div class="table-responsive">
-
-                <table class="table table-bordered table-striped align-middle">
-
-                    <thead class="table-dark">
-
-                        <tr>
-                            <th>No</th>
-                            <th>Anak</th>
-                            <th>Driver</th>
-                            <th>Jam Jemput</th>
-                            <th>Status</th>
-                            <th width="180">
-                                Aksi
-                            </th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @foreach($trips as $trip)
-
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-dark">
                             <tr>
-
-                                <td>
-                                    {{ $loop->iteration }}
-                                </td>
-
-                                <td>
-                                    {{ $trip->kid->name }}
-                                </td>
-
-                                <td>
-                                    {{ $trip->driver->user->name }}
-                                </td>
-
-                                <td>
-                                    {{ $trip->pickup_time }}
-                                </td>
-
-                                <td>
-
-                                    @if($trip->status == 'assigned')
-
-                                        <span class="badge bg-secondary">
-                                            Ditugaskan
-                                        </span>
-
-                                    @elseif($trip->status == 'on_pickup')
-
-                                        <span class="badge bg-warning text-dark">
-                                            Menuju Jemput
-                                        </span>
-
-                                    @elseif($trip->status == 'picked')
-
-                                        <span class="badge bg-primary">
-                                            Dijemput
-                                        </span>
-
-                                    @elseif($trip->status == 'on_delivery')
-
-                                        <span class="badge bg-success">
-                                            Diantar
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-                                <td>
-
-                                    <a href="/admin/trips/{{ $trip->id }}" class="btn btn-info btn-sm">
-
-                                        Detail
-
-                                    </a>
-
-                                </td>
-
+                                <th>Anak</th>
+                                <th>Orang Tua</th>
+                                <th>Sekolah</th>
+                                <th>Alamat</th>
+                                <th>Driver</th>
+                                <th>Jam Jemput</th>
+                                <th>Jam Antar</th>
+                                <th>Status</th>
                             </tr>
+                        </thead>
 
-                        @endforeach
+                        <tbody>
+                            @forelse($trips as $trip)
 
-                    </tbody>
+                                @php
+                                    $statusText = [
+                                        'assigned' => 'Ditugaskan',
+                                        'on_pickup' => 'Menuju Jemput',
+                                        'picked' => 'Dijemput',
+                                        'on_delivery' => 'Diantar',
+                                        'completed' => 'Selesai',
+                                    ];
 
-                </table>
+                                    $statusColor = [
+                                        'assigned' => 'secondary',
+                                        'on_pickup' => 'warning',
+                                        'picked' => 'info',
+                                        'on_delivery' => 'primary',
+                                        'completed' => 'success',
+                                    ];
+                                @endphp
+
+                                <tr>
+                                    <td>{{ $trip->kid->name ?? '-' }}</td>
+                                    <td>{{ $trip->kid->parent->name ?? '-' }}</td>
+                                    <td>{{ $trip->kid->school_name ?? '-' }}</td>
+                                    <td>{{ $trip->kid->address ?? '-' }}</td>
+                                    <td>{{ $trip->driver->user->name ?? '-' }}</td>
+
+                                    <td>
+                                        {{ $trip->pickup_time ? \Carbon\Carbon::parse($trip->pickup_time)->format('d/m/Y H:i') : '-' }}
+                                    </td>
+
+                                    <td>
+                                        {{ $trip->dropoff_time ? \Carbon\Carbon::parse($trip->dropoff_time)->format('d/m/Y H:i') : '-' }}
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-{{ $statusColor[$trip->status] ?? 'secondary' }}">
+                                            {{ $statusText[$trip->status] ?? $trip->status }}
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">
+                                        Belum ada riwayat perjalanan
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+
+                    </table>
+                </div>
 
             </div>
-
         </div>
 
     </div>
-
 @endsection

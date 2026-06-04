@@ -59,7 +59,6 @@
                                 <th>Status</th>
                                 <th>Sisa Hari</th>
                                 <th>Tanggal</th>
-                                <th width="180">Aksi</th>
 
                             </tr>
 
@@ -182,48 +181,6 @@
 
                                     </td>
 
-                                    {{-- AKSI --}}
-                                    <td>
-
-                                        <div class="d-flex gap-2">
-
-                                            {{-- PAUSE --}}
-                                            @if(!$subscription->is_paused)
-
-                                                <form action="{{ route('subscriptions.pause', $subscription->id) }}" method="POST">
-
-                                                    @csrf
-
-                                                    <button class="btn btn-warning btn-sm">
-
-                                                        <i class="bi bi-pause-fill"></i>
-                                                        Pause
-
-                                                    </button>
-
-                                                </form>
-
-                                            @else
-
-                                                {{-- RESUME --}}
-                                                <form action="{{ route('subscriptions.resume', $subscription->id) }}" method="POST">
-
-                                                    @csrf
-
-                                                    <button class="btn btn-success btn-sm">
-
-                                                        <i class="bi bi-play-fill"></i>
-                                                        Aktifkan
-
-                                                    </button>
-
-                                                </form>
-
-                                            @endif
-
-                                        </div>
-
-                                    </td>
 
                                 </tr>
 
@@ -231,7 +188,7 @@
 
                                 <tr>
 
-                                    <td colspan="8" class="text-center text-muted py-5">
+                                    <td colspan="7" class="text-center text-muted py-5">
 
                                         <i class="bi bi-credit-card fs-1 d-block mb-2"></i>
 
