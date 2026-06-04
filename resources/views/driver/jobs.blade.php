@@ -53,14 +53,14 @@
 
                                 <td>
 
-                                    @if($trip->kid->subscriptions->count())
+                                    @if($trip->kid->subscription)
 
-                                        {{ $trip->kid->subscriptions->first()->package_name }}
+                                        {{ $trip->kid->subscription->package_name }}
 
                                         <br>
 
                                         <span class="badge bg-success">
-                                            {{ $trip->kid->subscriptions->first()->status }}
+                                            {{ $trip->kid->subscription->status }}
                                         </span>
 
                                     @else

@@ -61,7 +61,7 @@ class RiwayatAntarJemputController extends Controller
 
         $kids = Kid::with([
             'parent',
-            'subscriptions',
+            'subscription',
         ])->get();
 
         return view(
@@ -81,7 +81,7 @@ class RiwayatAntarJemputController extends Controller
         $trips = RiwayatAntarJemput::with([
             'driver.user',
             'kid.parent',
-            'kid.subscriptions',
+            'kid.subscription',
         ])
             ->where('driver_id', $driver->id)
             ->latest()
@@ -116,7 +116,7 @@ class RiwayatAntarJemputController extends Controller
     {
         $trip = RiwayatAntarJemput::with([
             'kid.parent',
-            'kid.subscriptions',
+            'kid.subscription',
             'driver.user',
         ])->findOrFail($id);
 
