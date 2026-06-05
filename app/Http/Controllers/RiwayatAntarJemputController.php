@@ -70,59 +70,87 @@ class RiwayatAntarJemputController extends Controller
     {
         $request->validate([
             'driver_id' => 'required|exists:drivers,id',
-            'kid_id' => 'required|exists:kids,id',
+
+            'kid_ids' => 'required|array|min:1',
+
+            'kid_ids.*' => 'exists:kids,id',
+
             'pickup_time' => 'required|date_format:H:i',
-            'status' => 'required|in:assigned,on_pickup,picked,on_delivery,completed',
+
+            'status' => 'required|in:assigned,on_pickup,picked,on_delivery,delivered',
         ]);
 
         $driver = Driver::where('status', 'online')
             ->findOrFail($request->driver_id);
 
-        $kid = Kid::whereHas('subscriptions', function ($query) {
-            $query->where('status', 'active')
-                ->whereDate('start_date', '<=', Carbon::today())
-                ->whereDate('end_date', '>=', Carbon::today());
-        })
-            ->findOrFail($request->kid_id);
+        $selectedKids = Kid::whereIn('id', $request->kid_ids)
+            ->get();
 
-        $activeDriverTrip = RiwayatAntarJemput::where('driver_id', $driver->id)
+        $activePassengers = RiwayatAntarJemput::where('driver_id', $driver->id)
             ->whereIn('status', [
                 'assigned',
                 'on_pickup',
                 'picked',
                 'on_delivery',
             ])
-            ->exists();
+            ->count();
 
-        if ($activeDriverTrip) {
+        $totalPassengers =
+    $activePassengers + count($request->kid_ids);
+
+        if ($totalPassengers > $driver->capacity) {
             return back()
                 ->withInput()
-                ->with('error', 'Sopir masih memiliki perjalanan aktif.');
+                ->with(
+                    'error',
+                    'Jumlah anak melebihi kapasitas kendaraan.'
+                );
         }
 
-        $activeKidTrip = RiwayatAntarJemput::where('kid_id', $kid->id)
-            ->whereIn('status', [
-                'assigned',
-                'on_pickup',
-                'picked',
-                'on_delivery',
-            ])
-            ->exists();
+        foreach ($selectedKids as $kid) {
+            $activeKidTrip = RiwayatAntarJemput::where(
+                'kid_id',
+                $kid->id
+            )
+                ->whereIn('status', [
+                    'assigned',
+                    'on_pickup',
+                    'picked',
+                    'on_delivery',
+                ])
+                ->exists();
 
-        if ($activeKidTrip) {
-            return back()
-                ->withInput()
-                ->with('error', 'Anak ini masih memiliki perjalanan aktif.');
+            if ($activeKidTrip) {
+                return back()
+                    ->withInput()
+                    ->with(
+                        'error',
+                        'Anak '.$kid->name.' masih memiliki perjalanan aktif.'
+                    );
+            }
         }
 
         $pickupDateTime = Carbon::today()->format('Y-m-d').' '.$request->pickup_time.':00';
 
-        RiwayatAntarJemput::create([
-            'kid_id' => $kid->id,
-            'driver_id' => $driver->id,
-            'pickup_time' => $pickupDateTime,
-            'status' => $request->status,
-        ]);
+        $tripCode = 'TRIP-'.now()->format('YmdHis');
+
+        foreach ($selectedKids as $kid) {
+
+            RiwayatAntarJemput::create([
+
+                'kid_id' => $kid->id,
+
+                'driver_id' => $driver->id,
+
+                'trip_code' => $tripCode,
+
+                'pickup_time' => $pickupDateTime,
+
+                'status' => $request->status,
+
+            ]);
+
+        }
 
         return redirect('/admin/trips')
             ->with('success', 'Sopir berhasil ditugaskan.');
@@ -178,35 +206,35 @@ class RiwayatAntarJemputController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:assigned,on_pickup,picked,on_delivery,completed',
+            'status' => 'required|in:assigned,on_pickup,picked,on_delivery,delivered',
         ]);
 
-        $driver = Driver::where('user_id', auth()->id())->firstOrFail();
+        $driver = Driver::where('user_id', auth()->id())
+            ->firstOrFail();
 
-        $trip = RiwayatAntarJemput::where('driver_id', $driver->id)
-            ->findOrFail($id);
+        $trip = RiwayatAntarJemput::where(
+            'driver_id',
+            $driver->id
+        )->findOrFail($id);
 
-        $trip->status = $request->status;
+        $updateData = [
+            'status' => $request->status,
+        ];
 
-        /*
-        |--------------------------------------------------------------------------
-        | CATATAN PENTING
-        |--------------------------------------------------------------------------
-        | pickup_time adalah jadwal jemput dari admin.
-        | Jadi jangan ditimpa saat sopir update status.
-        |
-        | dropoff_time hanya diisi ketika perjalanan selesai.
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->status == 'completed' && ! $trip->dropoff_time) {
-            $trip->dropoff_time = now();
+        if ($request->status == 'delivered') {
+            $updateData['dropoff_time'] = now();
         }
 
-        $trip->save();
+        RiwayatAntarJemput::where(
+            'trip_code',
+            $trip->trip_code
+        )->update($updateData);
 
         return redirect('/driver/jobs')
-            ->with('success', 'Status perjalanan berhasil diperbarui.');
+            ->with(
+                'success',
+                'Status seluruh penumpang berhasil diperbarui.'
+            );
     }
 
     /*

@@ -52,4 +52,9 @@ class Kid extends Model
         return $this->hasOne(Subscription::class)
             ->latestOfMany();
     }
+
+    public function tripKids()
+    {
+        return $this->hasMany(TripKid::class);
+    }
 }

@@ -42,7 +42,7 @@
                                     'on_pickup' => 'Menuju Jemput',
                                     'picked' => 'Dijemput',
                                     'on_delivery' => 'Diantar',
-                                    'completed' => 'Selesai',
+                                    'delivered' => 'Selesai',
                                 ];
 
                                 $statusClass = [
@@ -50,8 +50,9 @@
                                     'on_pickup' => 'badge-pending',
                                     'picked' => 'badge-active',
                                     'on_delivery' => 'badge-active',
-                                    'completed' => 'badge-active',
+                                    'delivered' => 'badge-active',
                                 ];
+
                             @endphp
 
                             <tr>
@@ -113,7 +114,7 @@
                                                 Diantar
                                             </option>
 
-                                            <option value="completed" {{ $trip->status == 'completed' ? 'selected' : '' }}>
+                                            <option value="delivered" {{ $trip->status == 'delivered' ? 'selected' : '' }}>
                                                 Selesai
                                             </option>
                                         </select>

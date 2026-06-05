@@ -35,7 +35,7 @@
                                     'on_pickup' => 'Menuju Jemput',
                                     'picked' => 'Dijemput',
                                     'on_delivery' => 'Diantar',
-                                    'completed' => 'Selesai',
+                                    'delivered' => 'Selesai',
                                 ];
 
                                 $statusClass = [
@@ -43,7 +43,7 @@
                                     'on_pickup' => 'badge-pending',
                                     'picked' => 'badge-active',
                                     'on_delivery' => 'badge-active',
-                                    'completed' => 'badge-active',
+                                    'delivered' => 'badge-active',
                                 ];
                             @endphp
 

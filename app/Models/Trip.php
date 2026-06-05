@@ -4,12 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RiwayatAntarJemput extends Model
+class Trip extends Model
 {
     protected $fillable = [
         'driver_id',
-        'kid_id',
-        'trip_code',
         'status',
         'pickup_time',
         'dropoff_time',
@@ -20,8 +18,8 @@ class RiwayatAntarJemput extends Model
         return $this->belongsTo(Driver::class);
     }
 
-    public function kid()
+    public function tripKids()
     {
-        return $this->belongsTo(Kid::class);
+        return $this->hasMany(TripKid::class);
     }
 }

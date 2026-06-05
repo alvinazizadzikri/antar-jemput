@@ -35,19 +35,17 @@
             <div class="mb-3">
                 <label class="form-label">Anak</label>
 
-                <select name="kid_id" class="form-select" required>
-                    <option value="">-- Pilih Anak --</option>
+                @foreach($kids as $kid)
 
-                    @foreach($kids as $kid)
-                        <option value="{{ $kid->id }}">
+                    <div class="form-check">
+                        <input type="checkbox" name="kid_ids[]" value="{{ $kid->id }}" class="form-check-input">
+
+                        <label class="form-check-label">
                             {{ $kid->name }}
-                            -
-                            {{ $kid->parent->name ?? '-' }}
-                            -
-                            {{ $kid->school_name }}
-                        </option>
-                    @endforeach
-                </select>
+                        </label>
+                    </div>
+
+                @endforeach
             </div>
 
             <div class="mb-3">

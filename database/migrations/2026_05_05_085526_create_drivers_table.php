@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('vehicle_type');
             $table->string('plate_number');
             $table->enum('status', ['online', 'offline'])->default('offline');
+            $table->integer('capacity')->default(15);
             $table->timestamps();
         });
     }

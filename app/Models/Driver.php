@@ -25,6 +25,6 @@ class Driver extends Model
 
     public function trips()
     {
-        return $this->hasMany(RiwayatAntarJemput::class);
+        return $this->hasMany(Trip::class);
     }
 }
