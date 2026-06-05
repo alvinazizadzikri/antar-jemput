@@ -60,7 +60,7 @@
 
                                 <td>
                                     @if($trip->pickup_time)
-                                        {{ \Carbon\Carbon::parse($trip->pickup_time)->format('d/m/Y H:i') }}
+                                        {{ \Carbon\Carbon::parse($trip->pickup_time)->format('H:i') }}
                                     @else
                                         -
                                     @endif
@@ -68,7 +68,7 @@
 
                                 <td>
                                     @if($trip->dropoff_time)
-                                        {{ \Carbon\Carbon::parse($trip->dropoff_time)->format('d/m/Y H:i') }}
+                                        {{ \Carbon\Carbon::parse($trip->dropoff_time)->format('H:i') }}
                                     @else
                                         -
                                     @endif
