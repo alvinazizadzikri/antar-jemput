@@ -51,6 +51,7 @@ class RiwayatAntarJemputController extends Controller
                         'on_pickup',
                         'picked',
                         'on_delivery',
+                        'completed',
                     ])
                     ->count();
 
@@ -72,6 +73,7 @@ class RiwayatAntarJemputController extends Controller
                     'on_pickup',
                     'picked',
                     'on_delivery',
+                    'completed',
                 ]);
             })
             ->get();
@@ -98,6 +100,7 @@ class RiwayatAntarJemputController extends Controller
             'on_pickup',
             'picked',
             'on_delivery',
+            'completed',
         ];
 
         $selectedKidIds = collect($request->kid_ids)

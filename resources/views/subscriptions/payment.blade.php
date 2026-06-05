@@ -2,6 +2,8 @@
 
 @section('content')
 
+@include('components.subscription-info')
+
     <div class="section-header">
         <div>
             <div class="page-title">Detail Pembayaran</div>

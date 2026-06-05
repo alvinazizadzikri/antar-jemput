@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Holiday;
 use App\Models\Subscription;
 use App\Models\Transaction;
 use Carbon\Carbon;
@@ -169,7 +170,7 @@ class SubscriptionController extends Controller
                 'paid_at' => now(),
             ]);
 
-            $startDate = Carbon::today();
+            $startDate = $this->getSubscriptionStartDate();
             $endDate = $this->addSchoolDays($startDate, $duration);
 
             $subscription->update([
@@ -184,17 +185,28 @@ class SubscriptionController extends Controller
             ->with('success', 'Pembayaran berhasil. Langganan sudah aktif.');
     }
 
-    private function addSchoolDays(Carbon $startDate, int $totalSchoolDays)
-    {
+    private function addSchoolDays(
+        Carbon $startDate,
+        int $totalSchoolDays
+    ) {
         $date = $startDate->copy();
 
-        $count = $date->isWeekday() ? 1 : 0;
+        $count = 0;
 
         while ($count < $totalSchoolDays) {
-            $date->addDay();
+            $isWeekend = $date->isWeekend();
 
-            if ($date->isWeekday()) {
+            $isHoliday = Holiday::where(
+                'holiday_date',
+                $date->format('Y-m-d')
+            )->exists();
+
+            if (! $isWeekend && ! $isHoliday) {
                 $count++;
+            }
+
+            if ($count < $totalSchoolDays) {
+                $date->addDay();
             }
         }
 
@@ -238,7 +250,7 @@ class SubscriptionController extends Controller
 
         $duration = $durations[$subscription->package_name] ?? 1;
 
-        $startDate = Carbon::today();
+        $startDate = $this->getSubscriptionStartDate();
         $endDate = $this->addSchoolDays($startDate, $duration);
 
         $subscription->update([
@@ -249,5 +261,54 @@ class SubscriptionController extends Controller
         ]);
 
         return back()->with('success', 'Pembayaran berhasil diverifikasi');
+    }
+
+    private function getSubscriptionStartDate()
+    {
+        $date = Carbon::now();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Batas operasional armada
+        |--------------------------------------------------------------------------
+        | Jika pembayaran dilakukan setelah pukul 05:30,
+        | maka langganan mulai berlaku pada hari sekolah berikutnya.
+        |--------------------------------------------------------------------------
+        */
+
+        $cutoffHour = 5;
+        $cutoffMinute = 30;
+
+        $afterCutoff =
+            $date->hour > $cutoffHour
+            ||
+            (
+                $date->hour == $cutoffHour
+                &&
+                $date->minute >= $cutoffMinute
+            );
+
+        if ($afterCutoff) {
+            $date->addDay();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Lewati Sabtu, Minggu, dan Hari Libur Nasional
+        |--------------------------------------------------------------------------
+        */
+
+        while (
+            $date->isWeekend()
+            ||
+            Holiday::where(
+                'holiday_date',
+                $date->format('Y-m-d')
+            )->exists()
+        ) {
+            $date->addDay();
+        }
+
+        return $date->startOfDay();
     }
 }
