@@ -6,7 +6,7 @@
         <div>
             <div class="page-title">Penugasan Sopir</div>
             <div class="page-subtitle">
-                Pilih anak, sopir, jam jemput, dan status awal perjalanan
+                Pilih satu sopir dan beberapa anak sesuai kapasitas kendaraan
             </div>
         </div>
     </div>
@@ -33,22 +33,6 @@
             @csrf
 
             <div class="mb-3">
-                <label class="form-label">Anak</label>
-
-                @foreach($kids as $kid)
-
-                    <div class="form-check">
-                        <input type="checkbox" name="kid_ids[]" value="{{ $kid->id }}" class="form-check-input">
-
-                        <label class="form-check-label">
-                            {{ $kid->name }}
-                        </label>
-                    </div>
-
-                @endforeach
-            </div>
-
-            <div class="mb-3">
                 <label class="form-label">Sopir</label>
 
                 <select name="driver_id" class="form-select" required>
@@ -61,44 +45,54 @@
                             {{ $driver->vehicle_type ?? '-' }}
                             -
                             {{ $driver->plate_number ?? '-' }}
+                            | Kapasitas: {{ $driver->capacity }}
+                            | Terisi: {{ $driver->active_passengers_count }}
                         </option>
                     @endforeach
                 </select>
+
+                <small class="text-muted">
+                    Hanya sopir online yang muncul pada pilihan ini.
+                </small>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Jam Jemput</label>
+                <label class="form-label">Pilih Anak</label>
 
-                <input type="time" name="pickup_time" class="form-control" required>
+                <div class="page-card border">
+                    <div class="card-body">
+
+                        @forelse($kids as $kid)
+                            <div class="form-check mb-2">
+                                <input type="checkbox" name="kid_ids[]" value="{{ $kid->id }}" class="form-check-input"
+                                    id="kid_{{ $kid->id }}" {{ in_array($kid->id, old('kid_ids', [])) ? 'checked' : '' }}>
+
+                                <label class="form-check-label" for="kid_{{ $kid->id }}">
+                                    <strong>{{ $kid->name }}</strong>
+                                    -
+                                    {{ $kid->parent->name ?? '-' }}
+                                    -
+                                    {{ $kid->school_name }}
+                                </label>
+                            </div>
+                        @empty
+                            <div class="text-muted text-center py-3">
+                                Tidak ada anak yang bisa ditugaskan.
+                                Pastikan anak sudah memiliki langganan aktif dan belum dalam perjalanan aktif.
+                            </div>
+                        @endforelse
+
+                    </div>
+                </div>
             </div>
 
             <div class="mb-4">
-                <label class="form-label">Status Awal</label>
+                <label class="form-label">Jam Jemput</label>
 
-                <select name="status" class="form-select" required>
-                    <option value="assigned">
-                        Ditugaskan
-                    </option>
-
-                    <option value="on_pickup">
-                        Menuju Jemput
-                    </option>
-
-                    <option value="picked">
-                        Dijemput
-                    </option>
-
-                    <option value="on_delivery">
-                        Diantar
-                    </option>
-
-                    <option value="completed">
-                        Selesai
-                    </option>
-                </select>
+                <input type="time" name="pickup_time" class="form-control" value="{{ old('pickup_time') }}" required>
             </div>
 
-            <div class="d-flex gap-2">
+            <div class="form-action-row">
                 <button class="btn btn-primary-custom">
                     <i class="bi bi-save"></i>
                     Simpan Penugasan

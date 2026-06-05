@@ -7,15 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Driver extends Model
 {
     protected $fillable = [
-
         'user_id',
-
         'vehicle_type',
-
         'plate_number',
-
         'status',
-
+        'capacity',
     ];
 
     public function user()
@@ -25,6 +21,6 @@ class Driver extends Model
 
     public function trips()
     {
-        return $this->hasMany(Trip::class);
+        return $this->hasMany(RiwayatAntarJemput::class);
     }
 }

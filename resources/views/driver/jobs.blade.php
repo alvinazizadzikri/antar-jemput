@@ -6,7 +6,7 @@
         <div>
             <div class="page-title">Tugas Sopir</div>
             <div class="page-subtitle">
-                Daftar tugas antar jemput anak yang diberikan kepada sopir
+                Daftar perjalanan berdasarkan rombongan anak dalam satu trip
             </div>
         </div>
     </div>
@@ -24,25 +24,27 @@
                 <table class="custom-table table-compact">
                     <thead>
                         <tr>
+                            <th>Kode Trip</th>
                             <th>Anak</th>
                             <th>Orang Tua</th>
-                            <th>Alamat</th>
-                            <th>Langganan</th>
+                            <th>Jam Jemput</th>
                             <th>Status</th>
                             <th style="width: 320px;">Aksi</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        @forelse($trips as $trip)
+                        @forelse($tripGroups as $tripCode => $group)
 
                             @php
+                                $firstTrip = $group->first();
+
                                 $statusText = [
                                     'assigned' => 'Ditugaskan',
                                     'on_pickup' => 'Menuju Jemput',
                                     'picked' => 'Dijemput',
                                     'on_delivery' => 'Diantar',
-                                    'delivered' => 'Selesai',
+                                    'completed' => 'Selesai',
                                 ];
 
                                 $statusClass = [
@@ -50,71 +52,74 @@
                                     'on_pickup' => 'badge-pending',
                                     'picked' => 'badge-active',
                                     'on_delivery' => 'badge-active',
-                                    'delivered' => 'badge-active',
+                                    'completed' => 'badge-active',
                                 ];
-
                             @endphp
 
                             <tr>
                                 <td>
                                     <div class="fw-bold">
-                                        {{ $trip->kid->name ?? '-' }}
+                                        {{ $firstTrip->trip_code ?? '-' }}
                                     </div>
+
+                                    <small class="text-muted">
+                                        {{ $group->count() }} anak
+                                    </small>
                                 </td>
 
                                 <td>
-                                    {{ $trip->kid->parent->name ?? '-' }}
-                                </td>
-
-                                <td>
-                                    {{ $trip->kid->address ?? '-' }}
-                                </td>
-
-                                <td>
-                                    @if($trip->kid->subscription)
-                                        <div class="fw-semibold">
-                                            {{ $trip->kid->subscription->package_name }}
+                                    @foreach($group as $trip)
+                                        <div class="fw-bold">
+                                            {{ $trip->kid->name ?? '-' }}
                                         </div>
+                                    @endforeach
+                                </td>
 
-                                        <span class="badge-status badge-active">
-                                            {{ $trip->kid->subscription->status }}
-                                        </span>
+                                <td>
+                                    @foreach($group as $trip)
+                                        <div>
+                                            {{ $trip->kid->parent->name ?? '-' }}
+                                        </div>
+                                    @endforeach
+                                </td>
+
+                                <td>
+                                    @if($firstTrip->pickup_time)
+                                        {{ \Carbon\Carbon::parse($firstTrip->pickup_time)->format('H:i') }}
                                     @else
-                                        <span class="badge-status badge-danger">
-                                            Belum Langganan
-                                        </span>
+                                        -
                                     @endif
                                 </td>
 
                                 <td>
-                                    <span class="badge-status {{ $statusClass[$trip->status] ?? 'badge-assigned' }}">
-                                        {{ $statusText[$trip->status] ?? $trip->status }}
+                                    <span class="badge-status {{ $statusClass[$firstTrip->status] ?? 'badge-assigned' }}">
+                                        {{ $statusText[$firstTrip->status] ?? $firstTrip->status }}
                                     </span>
                                 </td>
 
                                 <td>
-                                    <form action="/driver/jobs/{{ $trip->id }}/status" method="POST" class="action-form">
+                                    <form action="/driver/jobs/{{ $firstTrip->id }}/status" method="POST" class="action-form">
                                         @csrf
                                         @method('PUT')
 
                                         <select name="status" class="form-select">
-                                            <option value="assigned" {{ $trip->status == 'assigned' ? 'selected' : '' }}>
+                                            <option value="assigned" {{ $firstTrip->status == 'assigned' ? 'selected' : '' }}>
                                                 Ditugaskan
                                             </option>
 
-                                            <option value="on_pickup" {{ $trip->status == 'on_pickup' ? 'selected' : '' }}>
+                                            <option value="on_pickup" {{ $firstTrip->status == 'on_pickup' ? 'selected' : '' }}>
                                                 Menuju Jemput
                                             </option>
 
-                                            <option value="picked" {{ $trip->status == 'picked' ? 'selected' : '' }}>
+                                            <option value="picked" {{ $firstTrip->status == 'picked' ? 'selected' : '' }}>
                                                 Dijemput
                                             </option>
 
-                                            <option value="on_delivery" {{ $trip->status == 'on_delivery' ? 'selected' : '' }}>
+                                            <option value="on_delivery" {{ $firstTrip->status == 'on_delivery' ? 'selected' : '' }}>
                                                 Diantar
                                             </option>
 
-                                            <option value="delivered" {{ $trip->status == 'delivered' ? 'selected' : '' }}>
+                                            <option value="completed" {{ $firstTrip->status == 'completed' ? 'selected' : '' }}>
                                                 Selesai
                                             </option>
                                         </select>

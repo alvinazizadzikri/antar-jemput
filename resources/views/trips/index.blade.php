@@ -6,7 +6,7 @@
         <div>
             <div class="page-title">Riwayat Perjalanan</div>
             <div class="page-subtitle">
-                Data seluruh perjalanan antar jemput anak yang telah ditugaskan oleh admin
+                Data perjalanan antar jemput berdasarkan kode trip
             </div>
         </div>
     </div>
@@ -30,11 +30,10 @@
                 <table class="custom-table">
                     <thead>
                         <tr>
+                            <th>Kode Trip</th>
+                            <th>Sopir</th>
                             <th>Anak</th>
                             <th>Orang Tua</th>
-                            <th>Sekolah</th>
-                            <th>Alamat</th>
-                            <th>Sopir</th>
                             <th>Jam Jemput</th>
                             <th>Jam Antar</th>
                             <th>Status</th>
@@ -43,9 +42,11 @@
                     </thead>
 
                     <tbody>
-                        @forelse($trips as $trip)
+                        @forelse($tripGroups as $tripCode => $group)
 
                             @php
+                                $firstTrip = $group->first();
+
                                 $statusText = [
                                     'assigned' => 'Ditugaskan',
                                     'on_pickup' => 'Menuju Jemput',
@@ -66,49 +67,58 @@
                             <tr>
                                 <td>
                                     <div class="fw-bold">
-                                        {{ $trip->kid->name ?? '-' }}
+                                        {{ $firstTrip->trip_code ?? '-' }}
                                     </div>
+
+                                    <small class="text-muted">
+                                        {{ $group->count() }} anak
+                                    </small>
                                 </td>
 
                                 <td>
-                                    {{ $trip->kid->parent->name ?? '-' }}
+                                    {{ $firstTrip->driver->user->name ?? '-' }}
                                 </td>
 
                                 <td>
-                                    {{ $trip->kid->school_name ?? '-' }}
+                                    @foreach($group as $trip)
+                                        <div class="fw-bold">
+                                            {{ $trip->kid->name ?? '-' }}
+                                        </div>
+                                    @endforeach
                                 </td>
 
                                 <td>
-                                    {{ $trip->kid->address ?? '-' }}
+                                    @foreach($group as $trip)
+                                        <div>
+                                            {{ $trip->kid->parent->name ?? '-' }}
+                                        </div>
+                                    @endforeach
                                 </td>
 
                                 <td>
-                                    {{ $trip->driver->user->name ?? '-' }}
-                                </td>
-
-                                <td>
-                                    @if($trip->pickup_time)
-                                        {{ \Carbon\Carbon::parse($trip->pickup_time)->format('d/m/Y H:i') }}
+                                    @if($firstTrip->pickup_time)
+                                        {{ \Carbon\Carbon::parse($firstTrip->pickup_time)->format('H:i') }}
                                     @else
                                         -
                                     @endif
                                 </td>
 
                                 <td>
-                                    @if($trip->dropoff_time)
-                                        {{ \Carbon\Carbon::parse($trip->dropoff_time)->format('d/m/Y H:i') }}
+                                    @if($firstTrip->dropoff_time)
+                                        {{ \Carbon\Carbon::parse($firstTrip->dropoff_time)->format('H:i') }}
                                     @else
                                         -
                                     @endif
                                 </td>
 
                                 <td>
-                                    <span class="badge-status {{ $statusClass[$trip->status] ?? 'badge-assigned' }}">
-                                        {{ $statusText[$trip->status] ?? $trip->status }}
+                                    <span class="badge-status {{ $statusClass[$firstTrip->status] ?? 'badge-assigned' }}">
+                                        {{ $statusText[$firstTrip->status] ?? $firstTrip->status }}
                                     </span>
                                 </td>
+
                                 <td>
-                                    <a href="/admin/trips/{{ $trip->id }}" class="icon-btn icon-btn-info"
+                                    <a href="/admin/trips/{{ $firstTrip->id }}" class="icon-btn icon-btn-info"
                                         title="Detail Perjalanan">
                                         <i class="bi bi-eye-fill"></i>
                                     </a>
@@ -117,7 +127,7 @@
 
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center text-muted py-4">
+                                <td colspan="8" class="text-center text-muted py-4">
                                     Belum ada riwayat perjalanan
                                 </td>
                             </tr>
