@@ -7,6 +7,7 @@ use App\Models\Kid;
 use App\Models\RiwayatAntarJemput;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class RiwayatAntarJemputController extends Controller
