@@ -12,6 +12,7 @@ class RiwayatAntarJemput extends Model
         'trip_code',
         'status',
         'pickup_time',
+        'actual_pickup_time',
         'dropoff_time',
     ];
 

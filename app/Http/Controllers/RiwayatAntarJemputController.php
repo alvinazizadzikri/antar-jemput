@@ -12,18 +12,57 @@ use Illuminate\Support\Str;
 
 class RiwayatAntarJemputController extends Controller
 {
+    private function activeTripStatuses(): array
+    {
+        return [
+            'assigned',
+            'on_pickup',
+            'picked',
+            'on_delivery',
+        ];
+    }
+
+    private function nextStatusMap(): array
+    {
+        return [
+            'assigned' => ['on_pickup'],
+            'on_pickup' => ['picked'],
+            'picked' => ['on_delivery'],
+            'on_delivery' => ['completed'],
+            'completed' => [],
+        ];
+    }
+
     /*
     |--------------------------------------------------------------------------
-    | ADMIN - RIWAYAT PERJALANAN
+    | ADMIN - RIWAYAT PERJALANAN + FILTER
     |--------------------------------------------------------------------------
     */
-    public function index()
+    public function index(Request $request)
     {
-        $trips = RiwayatAntarJemput::with([
+        $query = RiwayatAntarJemput::with([
             'driver.user',
             'kid.parent',
             'kid.subscription',
-        ])
+        ]);
+
+        if ($request->filled('trip_code')) {
+            $query->where('trip_code', 'like', '%'.$request->trip_code.'%');
+        }
+
+        if ($request->filled('driver_id')) {
+            $query->where('driver_id', $request->driver_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('pickup_time', $request->date);
+        }
+
+        $trips = $query
             ->latest()
             ->get();
 
@@ -31,29 +70,32 @@ class RiwayatAntarJemputController extends Controller
             return $trip->trip_code ?: 'OLD-'.$trip->id;
         });
 
-        return view('trips.index', compact('tripGroups'));
+        $drivers = Driver::with('user')
+            ->latest()
+            ->get();
+
+        return view('trips.index', compact('tripGroups', 'drivers'));
     }
 
     /*
     |--------------------------------------------------------------------------
-    | ADMIN - FORM ASSIGN DRIVER
+    | ADMIN - FORM ASSIGN DRIVER + BADGE KAPASITAS
     |--------------------------------------------------------------------------
     */
     public function create()
     {
+        $activeStatuses = $this->activeTripStatuses();
+
         $drivers = Driver::with('user')
             ->where('status', 'online')
             ->get()
-            ->map(function ($driver) {
-                $driver->active_passengers_count = RiwayatAntarJemput::where('driver_id', $driver->id)
-                    ->whereIn('status', [
-                        'assigned',
-                        'on_pickup',
-                        'picked',
-                        'on_delivery',
-                        'completed',
-                    ])
+            ->map(function ($driver) use ($activeStatuses) {
+                $activePassengersCount = RiwayatAntarJemput::where('driver_id', $driver->id)
+                    ->whereIn('status', $activeStatuses)
                     ->count();
+
+                $driver->active_passengers_count = $activePassengersCount;
+                $driver->remaining_capacity = max(0, ($driver->capacity ?? 0) - $activePassengersCount);
 
                 return $driver;
             });
@@ -67,14 +109,11 @@ class RiwayatAntarJemputController extends Controller
                     ->whereDate('start_date', '<=', Carbon::today())
                     ->whereDate('end_date', '>=', Carbon::today());
             })
-            ->whereDoesntHave('trips', function ($query) {
-                $query->whereIn('status', [
-                    'assigned',
-                    'on_pickup',
-                    'picked',
-                    'on_delivery',
-                    'completed',
-                ]);
+            ->whereDoesntHave('trips', function ($query) use ($activeStatuses) {
+                $query->whereIn('status', $activeStatuses);
+            })
+            ->whereDoesntHave('absences', function ($query) {
+                $query->whereDate('absence_date', Carbon::today());
             })
             ->get();
 
@@ -83,7 +122,7 @@ class RiwayatAntarJemputController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | ADMIN - SIMPAN ASSIGN DRIVER
+    | ADMIN - SIMPAN ASSIGN DRIVER MULTI ANAK
     |--------------------------------------------------------------------------
     */
     public function store(Request $request)
@@ -95,18 +134,23 @@ class RiwayatAntarJemputController extends Controller
             'pickup_time' => 'required|date_format:H:i',
         ]);
 
-        $activeStatuses = [
-            'assigned',
-            'on_pickup',
-            'picked',
-            'on_delivery',
-            'completed',
-        ];
+        $activeStatuses = $this->activeTripStatuses();
 
         $selectedKidIds = collect($request->kid_ids)
             ->unique()
             ->values()
             ->toArray();
+
+        $absence = KidAbsence::with('kid')
+            ->whereIn('kid_id', $selectedKidIds)
+            ->whereDate('absence_date', Carbon::today())
+            ->first();
+
+        if ($absence) {
+            return back()
+                ->withInput()
+                ->with('error', 'Anak '.$absence->kid->name.' sedang izin hari ini dan tidak dapat ditugaskan.');
+        }
 
         $driver = Driver::where('status', 'online')
             ->findOrFail($request->driver_id);
@@ -170,6 +214,8 @@ class RiwayatAntarJemputController extends Controller
                     'driver_id' => $driver->id,
                     'trip_code' => $tripCode,
                     'pickup_time' => $pickupDateTime,
+                    'actual_pickup_time' => null,
+                    'dropoff_time' => null,
                     'status' => 'assigned',
                 ]);
             }
@@ -184,7 +230,7 @@ class RiwayatAntarJemputController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | ADMIN - DETAIL PERJALANAN
+    | ADMIN - DETAIL PERJALANAN ROMBONGAN
     |--------------------------------------------------------------------------
     */
     public function show($id)
@@ -195,12 +241,25 @@ class RiwayatAntarJemputController extends Controller
             'driver.user',
         ])->findOrFail($id);
 
-        return view('trips.show', compact('trip'));
+        if ($trip->trip_code) {
+            $tripGroup = RiwayatAntarJemput::with([
+                'kid.parent',
+                'kid.subscription',
+                'driver.user',
+            ])
+                ->where('driver_id', $trip->driver_id)
+                ->where('trip_code', $trip->trip_code)
+                ->get();
+        } else {
+            $tripGroup = collect([$trip]);
+        }
+
+        return view('trips.show', compact('trip', 'tripGroup'));
     }
 
     /*
     |--------------------------------------------------------------------------
-    | DRIVER - JOB DRIVER
+    | DRIVER - JOB DRIVER BERDASARKAN TRIP CODE
     |--------------------------------------------------------------------------
     */
     public function driverJobs()
@@ -230,7 +289,7 @@ class RiwayatAntarJemputController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | DRIVER - UPDATE STATUS PERJALANAN
+    | DRIVER - UPDATE STATUS BERURUTAN DAN ROMBONGAN
     |--------------------------------------------------------------------------
     */
     public function updateStatus(Request $request, $id)
@@ -245,23 +304,44 @@ class RiwayatAntarJemputController extends Controller
         $trip = RiwayatAntarJemput::where('driver_id', $driver->id)
             ->findOrFail($id);
 
+        $currentStatus = $trip->status;
+        $newStatus = $request->status;
+
+        if ($currentStatus === 'completed') {
+            return redirect('/driver/jobs')
+                ->with('error', 'Perjalanan yang sudah selesai tidak dapat diubah lagi.');
+        }
+
+        $allowedNextStatuses = $this->nextStatusMap()[$currentStatus] ?? [];
+
+        if (! in_array($newStatus, $allowedNextStatuses)) {
+            return redirect('/driver/jobs')
+                ->with('error', 'Status tidak dapat dilompati. Ikuti urutan perjalanan yang tersedia.');
+        }
+
         $updateData = [
-            'status' => $request->status,
+            'status' => $newStatus,
         ];
 
-        if ($request->status == 'completed') {
+        if ($newStatus === 'picked') {
+            $updateData['actual_pickup_time'] = now();
+        }
+
+        if ($newStatus === 'completed') {
             $updateData['dropoff_time'] = now();
         }
 
-        $query = RiwayatAntarJemput::where('driver_id', $driver->id);
-
-        if ($trip->trip_code) {
-            $query->where('trip_code', $trip->trip_code);
-        } else {
-            $query->where('id', $trip->id);
-        }
-
-        $query->update($updateData);
+        DB::transaction(function () use ($trip, $driver, $updateData) {
+            if ($trip->trip_code) {
+                RiwayatAntarJemput::where('driver_id', $driver->id)
+                    ->where('trip_code', $trip->trip_code)
+                    ->update($updateData);
+            } else {
+                RiwayatAntarJemput::where('driver_id', $driver->id)
+                    ->where('id', $trip->id)
+                    ->update($updateData);
+            }
+        });
 
         return redirect('/driver/jobs')
             ->with('success', 'Status seluruh anak dalam perjalanan ini berhasil diperbarui.');
@@ -287,11 +367,6 @@ class RiwayatAntarJemputController extends Controller
         return view('riwayat.index', compact('trips'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | METHOD RESOURCE KOSONG
-    |--------------------------------------------------------------------------
-    */
     public function edit($id)
     {
         return redirect('/admin/trips');

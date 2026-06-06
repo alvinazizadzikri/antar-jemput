@@ -19,14 +19,14 @@
             'completed' => 'badge-active',
         ];
 
-        $subscription = $trip->kid->subscriptions->first();
+        $firstTrip = $tripGroup->first();
     @endphp
 
     <div class="section-header">
         <div>
             <div class="page-title">Detail Perjalanan</div>
             <div class="page-subtitle">
-                Detail data anak, sopir, kendaraan, dan status perjalanan
+                Detail perjalanan berdasarkan kode trip dan daftar anak dalam rombongan
             </div>
         </div>
 
@@ -37,104 +37,67 @@
         </div>
     </div>
 
-    <div class="page-card">
+    <div class="page-card mb-4">
         <div class="card-body">
 
             <div class="table-responsive">
                 <table class="detail-table">
 
                     <tr>
-                        <th>Nama Anak</th>
-                        <td>{{ $trip->kid->name ?? '-' }}</td>
-                    </tr>
-
-                    <tr>
-                        <th>Nama Orang Tua</th>
-                        <td>{{ $trip->kid->parent->name ?? '-' }}</td>
-                    </tr>
-
-                    <tr>
-                        <th>Alamat Rumah</th>
-                        <td>{{ $trip->kid->address ?? '-' }}</td>
-                    </tr>
-
-                    <tr>
-                        <th>Sekolah</th>
-                        <td>{{ $trip->kid->school_name ?? '-' }}</td>
-                    </tr>
-
-                    <tr>
-                        <th>Titik Jemput</th>
+                        <th>Kode Trip</th>
                         <td>
-                            <span class="point-badge-blue">
-                                {{ $trip->kid->pickup_point ?? '-' }}
+                            <span class="package-badge">
+                                {{ $firstTrip->trip_code ?? 'TRIP LAMA' }}
                             </span>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>Titik Antar</th>
-                        <td>
-                            <span class="point-badge-green">
-                                {{ $trip->kid->dropoff_point ?? '-' }}
-                            </span>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>Paket Langganan</th>
-                        <td>
-                            @if($subscription)
-                                <span class="package-badge">
-                                    {{ $subscription->package_name }}
-                                </span>
-
-                                <span class="ms-2">
-                                    Rp {{ number_format($subscription->price, 0, ',', '.') }}
-                                </span>
-                            @else
-                                <span class="badge-status badge-danger">
-                                    Belum Berlangganan
-                                </span>
-                            @endif
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>Foto Anak</th>
-                        <td>
-                            @if($trip->kid->photo)
-                                <img src="{{ asset('storage/' . $trip->kid->photo) }}" class="detail-photo">
-                            @else
-                                <span class="text-muted">Tidak ada foto</span>
-                            @endif
                         </td>
                     </tr>
 
                     <tr>
                         <th>Sopir</th>
-                        <td>{{ $trip->driver->user->name ?? '-' }}</td>
+                        <td>{{ $firstTrip->driver->user->name ?? '-' }}</td>
                     </tr>
 
                     <tr>
                         <th>Kendaraan</th>
-                        <td>{{ $trip->driver->vehicle_type ?? '-' }}</td>
+                        <td>{{ $firstTrip->driver->vehicle_type ?? '-' }}</td>
                     </tr>
 
                     <tr>
                         <th>Plat Nomor</th>
                         <td>
                             <span class="package-badge">
-                                {{ $trip->driver->plate_number ?? '-' }}
+                                {{ $firstTrip->driver->plate_number ?? '-' }}
                             </span>
                         </td>
                     </tr>
 
                     <tr>
-                        <th>Jam Jemput</th>
+                        <th>Jam Rencana Jemput</th>
                         <td>
-                            @if($trip->pickup_time)
-                                {{ \Carbon\Carbon::parse($trip->pickup_time)->format('d/m/Y H:i') }}
+                            @if($firstTrip->pickup_time)
+                                {{ \Carbon\Carbon::parse($firstTrip->pickup_time)->format('H:i') }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Jam Aktual Jemput</th>
+                        <td>
+                            @if($firstTrip->actual_pickup_time)
+                                {{ \Carbon\Carbon::parse($firstTrip->actual_pickup_time)->format('H:i') }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Jam Antar</th>
+                        <td>
+                            @if($firstTrip->dropoff_time)
+                                {{ \Carbon\Carbon::parse($firstTrip->dropoff_time)->format('H:i') }}
                             @else
                                 -
                             @endif
@@ -144,12 +107,101 @@
                     <tr>
                         <th>Status</th>
                         <td>
-                            <span class="badge-status {{ $statusClass[$trip->status] ?? 'badge-assigned' }}">
-                                {{ $statusText[$trip->status] ?? $trip->status }}
+                            <span class="badge-status {{ $statusClass[$firstTrip->status] ?? 'badge-assigned' }}">
+                                {{ $statusText[$firstTrip->status] ?? $firstTrip->status }}
                             </span>
                         </td>
                     </tr>
 
+                    <tr>
+                        <th>Jumlah Anak</th>
+                        <td>{{ $tripGroup->count() }} anak</td>
+                    </tr>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="page-card">
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">Daftar Anak dalam Perjalanan</h5>
+
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Anak</th>
+                            <th>Orang Tua</th>
+                            <th>Sekolah</th>
+                            <th>Alamat</th>
+                            <th>Titik Jemput</th>
+                            <th>Titik Antar</th>
+                            <th>Langganan</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($tripGroup as $item)
+
+                            @php
+                                $subscription = $item->kid->subscription;
+                            @endphp
+
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">
+                                        {{ $item->kid->name ?? '-' }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {{ $item->kid->parent->name ?? '-' }}
+                                </td>
+
+                                <td>
+                                    {{ $item->kid->school_name ?? '-' }}
+                                </td>
+
+                                <td>
+                                    {{ $item->kid->address ?? '-' }}
+                                </td>
+
+                                <td>
+                                    <span class="point-badge-blue">
+                                        {{ $item->kid->pickup_point ?? '-' }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="point-badge-green">
+                                        {{ $item->kid->dropoff_point ?? '-' }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if($subscription)
+                                        <span class="package-badge">
+                                            {{ $subscription->package_name }}
+                                        </span>
+                                    @else
+                                        <span class="badge-status badge-danger">
+                                            Tidak Aktif
+                                        </span>
+                                    @endif
+                                </td>
+                            </tr>
+
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    Tidak ada anak dalam perjalanan ini
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
                 </table>
             </div>
 

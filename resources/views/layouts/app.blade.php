@@ -64,6 +64,13 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="/izin-anak" class="nav-link {{ request()->is('izin-anak*') ? 'active' : '' }}">
+                            <i class="bi bi-calendar-x"></i>
+                            Izin Anak
+                        </a>
+                    </li>
+
                 @endif
 
                 {{-- MENU ADMIN --}}
@@ -95,6 +102,13 @@
                         <a href="/admin/transaksi" class="nav-link {{ request()->is('admin/transaksi*') ? 'active' : '' }}">
                             <i class="bi bi-receipt"></i>
                             Transaksi
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/admin/izin-anak" class="nav-link {{ request()->is('admin/izin-anak*') ? 'active' : '' }}">
+                            <i class="bi bi-calendar-x"></i>
+                            Izin Anak
                         </a>
                     </li>
 

@@ -36,6 +36,42 @@
     <div class="form-card">
 
         <div class="form-section-title">
+            Kapasitas Sopir
+        </div>
+
+        <div class="capacity-summary-grid mb-4">
+            @forelse($drivers as $driver)
+                <div class="capacity-summary-card">
+                    <div class="fw-bold">
+                        {{ $driver->user->name ?? '-' }}
+                    </div>
+
+                    <small class="text-muted d-block mb-2">
+                        {{ $driver->vehicle_type ?? '-' }} | {{ $driver->plate_number ?? '-' }}
+                    </small>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="badge-status badge-assigned">
+                            Kapasitas: {{ $driver->capacity }}
+                        </span>
+
+                        <span class="badge-status badge-pending">
+                            Terisi: {{ $driver->active_passengers_count }}
+                        </span>
+
+                        <span class="badge-status badge-active">
+                            Sisa: {{ $driver->remaining_capacity }}
+                        </span>
+                    </div>
+                </div>
+            @empty
+                <div class="text-muted">
+                    Belum ada sopir online.
+                </div>
+            @endforelse
+        </div>
+
+        <div class="form-section-title">
             Form Penugasan Sopir
         </div>
 
@@ -49,14 +85,13 @@
                     <option value="">-- Pilih Sopir --</option>
 
                     @foreach($drivers as $driver)
-                        <option value="{{ $driver->id }}">
+                        <option value="{{ $driver->id }}" {{ old('driver_id') == $driver->id ? 'selected' : '' }}>
                             {{ $driver->user->name }}
                             -
                             {{ $driver->vehicle_type ?? '-' }}
                             -
                             {{ $driver->plate_number ?? '-' }}
-                            | Kapasitas: {{ $driver->capacity }}
-                            | Terisi: {{ $driver->active_passengers_count }}
+                            | Sisa Kapasitas: {{ $driver->remaining_capacity }}
                         </option>
                     @endforeach
                 </select>
@@ -97,9 +132,14 @@
             </div>
 
             <div class="mb-4">
-                <label class="form-label">Jam Jemput</label>
+                <label class="form-label">Jam Rencana Jemput</label>
 
                 <input type="time" name="pickup_time" class="form-control" value="{{ old('pickup_time') }}" required>
+
+                <small class="text-muted">
+                    Jam ini adalah jadwal rencana jemput dari admin. Jam aktual akan dicatat saat sopir menekan “Anak
+                    Dijemput”.
+                </small>
             </div>
 
             <div class="form-action-row">

@@ -859,3 +859,16 @@ body {
 .alert-warning h6 {
     color: #7a5d00;
 }
+
+.capacity-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+}
+
+.capacity-summary-card {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 16px;
+}

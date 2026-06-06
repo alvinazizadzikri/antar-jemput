@@ -23,6 +23,62 @@
         </div>
     @endif
 
+    <div class="search-card">
+        <form method="GET" action="/admin/trips">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-3">
+                    <label class="form-label">Kode Trip</label>
+                    <input type="text" name="trip_code" class="form-control" placeholder="Cari kode trip..."
+                        value="{{ request('trip_code') }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Sopir</label>
+                    <select name="driver_id" class="form-select">
+                        <option value="">Semua Sopir</option>
+
+                        @foreach($drivers as $driver)
+                            <option value="{{ $driver->id }}" {{ request('driver_id') == $driver->id ? 'selected' : '' }}>
+                                {{ $driver->user->name ?? '-' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">Semua Status</option>
+                        <option value="assigned" {{ request('status') == 'assigned' ? 'selected' : '' }}>Ditugaskan</option>
+                        <option value="on_pickup" {{ request('status') == 'on_pickup' ? 'selected' : '' }}>Menuju Jemput
+                        </option>
+                        <option value="picked" {{ request('status') == 'picked' ? 'selected' : '' }}>Dijemput</option>
+                        <option value="on_delivery" {{ request('status') == 'on_delivery' ? 'selected' : '' }}>Diantar
+                        </option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Tanggal</label>
+                    <input type="date" name="date" class="form-control" value="{{ request('date') }}">
+                </div>
+
+                <div class="col-md-2 d-flex gap-2">
+                    <button class="btn btn-primary-custom w-100">
+                        Filter
+                    </button>
+
+                    <a href="/admin/trips" class="btn btn-secondary-custom">
+                        Reset
+                    </a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
     <div class="page-card">
         <div class="card-body">
 
@@ -34,7 +90,8 @@
                             <th>Sopir</th>
                             <th>Anak</th>
                             <th>Orang Tua</th>
-                            <th>Jam Jemput</th>
+                            <th>Rencana Jemput</th>
+                            <th>Aktual Jemput</th>
                             <th>Jam Antar</th>
                             <th>Status</th>
                             <th style="width: 100px;">Aksi</th>
@@ -67,7 +124,7 @@
                             <tr>
                                 <td>
                                     <div class="fw-bold">
-                                        {{ $firstTrip->trip_code ?? '-' }}
+                                        {{ $firstTrip->trip_code ?? 'TRIP LAMA' }}
                                     </div>
 
                                     <small class="text-muted">
@@ -104,6 +161,14 @@
                                 </td>
 
                                 <td>
+                                    @if($firstTrip->actual_pickup_time)
+                                        {{ \Carbon\Carbon::parse($firstTrip->actual_pickup_time)->format('H:i') }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+
+                                <td>
                                     @if($firstTrip->dropoff_time)
                                         {{ \Carbon\Carbon::parse($firstTrip->dropoff_time)->format('H:i') }}
                                     @else
@@ -127,7 +192,7 @@
 
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center text-muted py-4">
+                                <td colspan="9" class="text-center text-muted py-4">
                                     Belum ada riwayat perjalanan
                                 </td>
                             </tr>

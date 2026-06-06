@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\KidAbsenceController;
 use App\Http\Controllers\KidController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatAntarJemputController;
@@ -118,7 +119,32 @@ Route::middleware(['auth'])
             [DriverController::class, 'history']
         );
 
+        Route::get(
+            '/izin-anak',
+            [KidAbsenceController::class, 'adminIndex']
+        )->name('admin.absences.index');
+
     });
+
+// =======================
+// IZIN ANAK - PARENT
+// =======================
+
+Route::get('/izin-anak', [KidAbsenceController::class, 'index'])
+    ->middleware('auth')
+    ->name('absences.index');
+
+Route::get('/izin-anak/create', [KidAbsenceController::class, 'create'])
+    ->middleware('auth')
+    ->name('absences.create');
+
+Route::post('/izin-anak', [KidAbsenceController::class, 'store'])
+    ->middleware('auth')
+    ->name('absences.store');
+
+Route::delete('/izin-anak/{id}', [KidAbsenceController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('absences.destroy');
 // =======================
 // DRIVER
 // =======================

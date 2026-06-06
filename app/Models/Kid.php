@@ -57,4 +57,9 @@ class Kid extends Model
     {
         return $this->hasMany(TripKid::class);
     }
+
+    public function absences()
+    {
+        return $this->hasMany(KidAbsence::class);
+    }
 }

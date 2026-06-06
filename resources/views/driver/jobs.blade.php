@@ -17,6 +17,12 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="page-card">
         <div class="card-body">
 
@@ -27,9 +33,10 @@
                             <th>Kode Trip</th>
                             <th>Anak</th>
                             <th>Orang Tua</th>
-                            <th>Jam Jemput</th>
+                            <th>Rencana Jemput</th>
+                            <th>Aktual Jemput</th>
                             <th>Status</th>
-                            <th style="width: 320px;">Aksi</th>
+                            <th style="width: 220px;">Aksi Berikutnya</th>
                         </tr>
                     </thead>
 
@@ -54,12 +61,31 @@
                                     'on_delivery' => 'badge-active',
                                     'completed' => 'badge-active',
                                 ];
+
+                                $nextStatus = [
+                                    'assigned' => [
+                                        'value' => 'on_pickup',
+                                        'label' => 'Mulai Jemput',
+                                    ],
+                                    'on_pickup' => [
+                                        'value' => 'picked',
+                                        'label' => 'Anak Dijemput',
+                                    ],
+                                    'picked' => [
+                                        'value' => 'on_delivery',
+                                        'label' => 'Mulai Antar',
+                                    ],
+                                    'on_delivery' => [
+                                        'value' => 'completed',
+                                        'label' => 'Selesaikan',
+                                    ],
+                                ][$firstTrip->status] ?? null;
                             @endphp
 
                             <tr>
                                 <td>
                                     <div class="fw-bold">
-                                        {{ $firstTrip->trip_code ?? '-' }}
+                                        {{ $firstTrip->trip_code ?? 'TRIP LAMA' }}
                                     </div>
 
                                     <small class="text-muted">
@@ -92,48 +118,42 @@
                                 </td>
 
                                 <td>
+                                    @if($firstTrip->actual_pickup_time)
+                                        {{ \Carbon\Carbon::parse($firstTrip->actual_pickup_time)->format('H:i') }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+
+                                <td>
                                     <span class="badge-status {{ $statusClass[$firstTrip->status] ?? 'badge-assigned' }}">
                                         {{ $statusText[$firstTrip->status] ?? $firstTrip->status }}
                                     </span>
                                 </td>
 
                                 <td>
-                                    <form action="/driver/jobs/{{ $firstTrip->id }}/status" method="POST" class="action-form">
-                                        @csrf
-                                        @method('PUT')
+                                    @if($nextStatus)
+                                        <form action="/driver/jobs/{{ $firstTrip->id }}/status" method="POST" class="action-form">
+                                            @csrf
+                                            @method('PUT')
 
-                                        <select name="status" class="form-select">
-                                            <option value="assigned" {{ $firstTrip->status == 'assigned' ? 'selected' : '' }}>
-                                                Ditugaskan
-                                            </option>
+                                            <input type="hidden" name="status" value="{{ $nextStatus['value'] }}">
 
-                                            <option value="on_pickup" {{ $firstTrip->status == 'on_pickup' ? 'selected' : '' }}>
-                                                Menuju Jemput
-                                            </option>
-
-                                            <option value="picked" {{ $firstTrip->status == 'picked' ? 'selected' : '' }}>
-                                                Dijemput
-                                            </option>
-
-                                            <option value="on_delivery" {{ $firstTrip->status == 'on_delivery' ? 'selected' : '' }}>
-                                                Diantar
-                                            </option>
-
-                                            <option value="completed" {{ $firstTrip->status == 'completed' ? 'selected' : '' }}>
-                                                Selesai
-                                            </option>
-                                        </select>
-
-                                        <button type="submit" class="btn btn-primary-custom">
-                                            Update
-                                        </button>
-                                    </form>
+                                            <button type="submit" class="btn btn-primary-custom">
+                                                {{ $nextStatus['label'] }}
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="fw-bold text-success">
+                                            Perjalanan selesai
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
 
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
+                                <td colspan="7" class="text-center text-muted py-4">
                                     Belum ada tugas sopir
                                 </td>
                             </tr>
