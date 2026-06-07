@@ -44,6 +44,33 @@ Route::resource('kids', KidController::class)
     ->middleware('auth');
 
 // =======================
+// SUBSCRIPTIONS
+// =======================
+
+Route::resource('subscriptions', SubscriptionController::class)
+    ->middleware('auth');
+
+Route::post(
+    '/subscriptions/{id}/pause',
+    [SubscriptionController::class, 'pause']
+)->name('subscriptions.pause');
+
+Route::post(
+    '/subscriptions/{id}/resume',
+    [SubscriptionController::class, 'resume']
+)->name('subscriptions.resume');
+
+Route::get(
+    '/subscriptions/{id}/cash',
+    [SubscriptionController::class, 'cashPayment']
+)->name('subscriptions.cash');
+
+Route::post(
+    '/subscriptions/{id}/cash-confirm',
+    [SubscriptionController::class, 'cashConfirm']
+)->name('subscriptions.cash.confirm');
+
+// =======================
 // PROFILE
 // =======================
 
@@ -57,8 +84,6 @@ Route::post('/profile', [ProfileController::class, 'update'])
 // SUBSCRIPTIONS
 // =======================
 
-Route::resource('subscriptions', SubscriptionController::class)
-    ->middleware('auth');
 
 Route::get(
     '/subscriptions/{id}/payment',
@@ -112,6 +137,11 @@ Route::middleware(['auth'])
             '/transaksi/{id}/verifikasi',
             [SubscriptionController::class, 'verifikasiPembayaran']
         )->name('admin.transaksi.verifikasi');
+
+        Route::post(
+            '/transaksi/{id}/verify-cash',
+            [SubscriptionController::class, 'verifyCash']
+        )->name('admin.transaksi.verifyCash');
 
         // HISTORY DRIVER
         Route::get(

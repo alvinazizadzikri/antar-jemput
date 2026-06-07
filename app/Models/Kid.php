@@ -43,7 +43,14 @@ class Kid extends Model
     public function activeSubscription()
     {
         return $this->hasOne(Subscription::class)
-            ->whereIn('status', ['pending', 'active'])
+            ->whereIn(
+                'status',
+                [
+                    'pending',
+                    'pending_cash',
+                    'active',
+                ]
+            )
             ->latestOfMany();
     }
 

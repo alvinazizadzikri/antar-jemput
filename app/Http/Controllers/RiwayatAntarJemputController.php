@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\KidAbsence;
 use App\Models\Driver;
 use App\Models\Kid;
 use App\Models\RiwayatAntarJemput;

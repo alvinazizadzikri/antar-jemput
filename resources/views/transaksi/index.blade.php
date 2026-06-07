@@ -70,43 +70,112 @@
 
                                 <td>
                                     @if($subscription->status == 'pending')
+
                                         <span class="badge-status badge-pending">
-                                            Menunggu Pembayaran
+                                            Menunggu Pembayaran QRIS
                                         </span>
+
+                                    @elseif($subscription->status == 'pending_cash')
+
+                                        <span class="badge-status badge-assigned">
+                                            Menunggu Pembayaran Cash
+                                        </span>
+
                                     @elseif($subscription->status == 'paid')
+
                                         <span class="badge-status badge-assigned">
                                             Dibayar
                                         </span>
+
                                     @elseif($subscription->status == 'active')
+
                                         <span class="badge-status badge-active">
                                             Aktif
                                         </span>
+
+                                    @elseif($subscription->status == 'cancelled')
+
+                                        <span class="badge-status badge-danger">
+                                            Dibatalkan
+                                        </span>
+
                                     @else
+
                                         <span class="badge-status badge-danger">
                                             Expired
                                         </span>
+
                                     @endif
                                 </td>
 
                                 <td>
+
                                     {{ $subscription->created_at->format('d/m/Y H:i') }}
+
+                                    @if($subscription->status == 'pending_cash')
+
+                                        <br>
+
+                                        <small class="text-danger">
+                                            Tenggat:
+                                            {{ \Carbon\Carbon::parse($subscription->cash_deadline)->format('d/m/Y H:i') }}
+                                        </small>
+
+                                    @endif
+
                                 </td>
 
                                 <td>
-                                    @if($subscription->status == 'pending' || $subscription->status == 'paid')
-                                        <form action="{{ route('admin.transaksi.verifikasi', $subscription->id) }}" method="POST">
-                                            @csrf
 
-                                            <button class="btn btn-success-custom btn-sm">
-                                                Verifikasi
-                                            </button>
-                                        </form>
-                                    @else
-                                        <span class="table-action-text">
-                                            Sudah aktif
-                                        </span>
-                                    @endif
-                                </td>
+    @if($subscription->status == 'pending')
+
+        <form
+            action="{{ route('admin.transaksi.verifikasi', $subscription->id) }}"
+            method="POST">
+
+            @csrf
+
+            <button class="btn btn-success-custom btn-sm">
+                Verifikasi QRIS
+            </button>
+
+        </form>
+
+    @elseif($subscription->status == 'pending_cash')
+
+        <form
+            action="{{ route('admin.transaksi.verifyCash', $subscription->id) }}"
+            method="POST">
+
+            @csrf
+
+            <button class="btn btn-warning btn-sm">
+                Verifikasi Cash
+            </button>
+
+        </form>
+
+    @elseif($subscription->status == 'active')
+
+        <span class="table-action-text">
+            Sudah Aktif
+        </span>
+
+    @elseif($subscription->status == 'cancelled')
+
+        <span class="text-danger">
+            Dibatalkan
+        </span>
+
+    @else
+
+        <span class="table-action-text">
+            -
+        </span>
+
+    @endif
+
+</td>
                             </tr>
                         @empty
                             <tr>

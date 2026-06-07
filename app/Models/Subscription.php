@@ -21,6 +21,10 @@ class Subscription extends Model
         'pause_end',
         'remaining_days',
         'pause_reason',
+        'cash_due_date',
+        'cash_paid_at',
+        'verified_by',
+        'cash_deadline',
     ];
 
     public function user()

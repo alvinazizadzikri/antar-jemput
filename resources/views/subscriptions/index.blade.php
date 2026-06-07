@@ -98,26 +98,55 @@
 
                                 <td>
                                     @if(!$subscription)
-                                        <span class="badge-status badge-neutral">
-                                            Belum Langganan
-                                        </span>
-                                    @elseif($subscription->status == 'pending')
-                                        <span class="badge-status badge-pending">
-                                            Menunggu Pembayaran
-                                        </span>
-                                    @elseif($subscription->status == 'active')
-                                        <span class="badge-status badge-active">
-                                            Aktif
-                                        </span>
-                                    @elseif($subscription->status == 'paid')
-                                        <span class="badge-status badge-assigned">
-                                            Dibayar
-                                        </span>
-                                    @else
-                                        <span class="badge-status badge-danger">
-                                            Expired
-                                        </span>
-                                    @endif
+
+    <span class="badge-status badge-neutral">
+        Belum Langganan
+    </span>
+
+@elseif($subscription->status == 'pending')
+
+    <span class="badge-status badge-pending">
+        Menunggu Pembayaran QRIS
+    </span>
+
+@elseif($subscription->status == 'pending_cash')
+
+    <span class="badge-status badge-assigned">
+        Menunggu Pembayaran Cash
+    </span>
+
+    <br>
+
+    <small class="text-danger">
+        Tenggat:
+        {{ \Carbon\Carbon::parse($subscription->cash_deadline)->format('d M Y H:i') }}
+    </small>
+
+@elseif($subscription->status == 'active')
+
+    <span class="badge-status badge-active">
+        Aktif
+    </span>
+
+@elseif($subscription->status == 'cancelled')
+
+    <span class="badge-status badge-danger">
+        Dibatalkan
+    </span>
+
+@elseif($subscription->status == 'paid')
+
+    <span class="badge-status badge-assigned">
+        Dibayar
+    </span>
+
+@else
+
+    <span class="badge-status badge-danger">
+        Expired
+    </span>
+
+@endif
                                 </td>
 
                                 <td>
@@ -138,24 +167,45 @@
 
                                 <td>
                                     @if(!$subscription || $subscription->status == 'expired')
-                                        <a href="{{ route('subscriptions.create') }}?kid_id={{ $kid->id }}"
-                                            class="btn btn-primary-custom btn-sm">
-                                            Pilih Paket
-                                        </a>
-                                    @elseif($subscription->status == 'pending')
-                                        <a href="{{ route('subscriptions.payment', $subscription->id) }}"
-                                            class="btn btn-warning-custom btn-sm">
-                                            Bayar Sekarang
-                                        </a>
-                                    @elseif($subscription->status == 'active')
-                                        <span class="fw-bold text-success">
-                                            Aktif
-                                        </span>
-                                    @else
-                                        <span class="text-muted">
-                                            -
-                                        </span>
-                                    @endif
+
+    <a href="{{ route('subscriptions.create') }}?kid_id={{ $kid->id }}"
+        class="btn btn-primary-custom btn-sm">
+        Pilih Paket
+    </a>
+
+@elseif($subscription->status == 'pending')
+
+    <a href="{{ route('subscriptions.payment', $subscription->id) }}"
+        class="btn btn-warning-custom btn-sm">
+        Bayar QRIS
+    </a>
+
+@elseif($subscription->status == 'pending_cash')
+
+    <a href="{{ route('subscriptions.cash', $subscription->id) }}"
+        class="btn btn-warning-custom btn-sm">
+        Detail Cash
+    </a>
+
+@elseif($subscription->status == 'active')
+
+    <span class="fw-bold text-success">
+        Aktif
+    </span>
+
+@elseif($subscription->status == 'cancelled')
+
+    <span class="text-danger fw-bold">
+        Dibatalkan
+    </span>
+
+@else
+
+    <span class="text-muted">
+        -
+    </span>
+
+@endif
                                 </td>
                             </tr>
 

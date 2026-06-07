@@ -2,7 +2,7 @@
 
 @section('content')
 
-@include('components.subscription-info')
+    @include('components.subscription-info')
 
     <div class="section-header">
         <div>
@@ -42,6 +42,29 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            Metode Pembayaran
+                        </label>
+
+                        <select name="payment_method" class="form-select" required>
+
+                            <option value="QRIS">
+                                QRIS
+                            </option>
+
+                            <option value="Cash">
+                                Cash
+                            </option>
+
+                        </select>
+
+                        <small class="text-muted">
+                            QRIS akan langsung diproses setelah pembayaran berhasil.
+                            Pembayaran Cash harus diverifikasi oleh admin atau sopir.
+                        </small>
                     </div>
 
                     <div class="row g-4">
