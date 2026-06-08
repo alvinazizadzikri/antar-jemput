@@ -21,6 +21,7 @@
                             <th>Anak</th>
                             <th>Sopir</th>
                             <th>No. Telepon Sopir</th>
+                            <th>Tanggal</th>
                             <th>Jam Jemput</th>
                             <th>Jam Antar</th>
                             <th>Status</th>
@@ -59,6 +60,14 @@
                                         $waPhone = $cleanPhone;
                                     }
                                 }
+
+                                $tanggalPerjalanan = '-';
+
+                                if ($trip->pickup_time) {
+                                    $tanggalPerjalanan = \Carbon\Carbon::parse($trip->pickup_time)
+                                        ->locale('id')
+                                        ->translatedFormat('l, d F Y');
+                                }
                             @endphp
 
                             <tr>
@@ -89,6 +98,12 @@
                                 </td>
 
                                 <td>
+                                    <div class="fw-semibold">
+                                        {{ $tanggalPerjalanan }}
+                                    </div>
+                                </td>
+
+                                <td>
                                     @if($trip->pickup_time)
                                         {{ \Carbon\Carbon::parse($trip->pickup_time)->format('H:i') }}
                                     @else
@@ -113,7 +128,7 @@
 
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
+                                <td colspan="7" class="text-center text-muted py-4">
                                     Belum ada riwayat antar jemput
                                 </td>
                             </tr>

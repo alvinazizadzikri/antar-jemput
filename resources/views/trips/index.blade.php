@@ -103,6 +103,7 @@
                             <th>Sopir</th>
                             <th>Anak</th>
                             <th>Orang Tua</th>
+                            <th>Tanggal</th>
                             <th>Rencana Jemput</th>
                             <th>Aktual Jemput</th>
                             <th>Jam Antar</th>
@@ -132,7 +133,14 @@
                                     'picked_up_school' => 'badge-pending',
                                     'completed' => 'badge-active',
                                 ];
-                                ;
+
+                                $tanggalPerjalanan = '-';
+
+                                if ($firstTrip->pickup_time) {
+                                    $tanggalPerjalanan = \Carbon\Carbon::parse($firstTrip->pickup_time)
+                                        ->locale('id')
+                                        ->translatedFormat('l, d F Y');
+                                }
                             @endphp
 
                             <tr>
@@ -164,6 +172,12 @@
                                             {{ $trip->kid->parent->name ?? '-' }}
                                         </div>
                                     @endforeach
+                                </td>
+
+                                <td>
+                                    <div class="fw-semibold">
+                                        {{ $tanggalPerjalanan }}
+                                    </div>
                                 </td>
 
                                 <td>
@@ -206,7 +220,7 @@
 
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center text-muted py-4">
+                                <td colspan="10" class="text-center text-muted py-4">
                                     Belum ada riwayat perjalanan
                                 </td>
                             </tr>
