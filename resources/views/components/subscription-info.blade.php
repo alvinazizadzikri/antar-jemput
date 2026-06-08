@@ -37,6 +37,14 @@
                 </li>
 
                 <li>
+                    jika pembayaran dilakukan dengan cash maka 
+                    harap membayar ke sopir ataupun langsung ke
+                    admin dengan tenggat waktu pembayaran yaitu
+                    <strong>3 HARI</strong>
+                    setelah memilih langganan
+                </li>
+
+                <li>
                     Jika hari berikutnya merupakan akhir pekan
                     atau hari libur nasional, sistem otomatis
                     menggeser layanan ke hari sekolah berikutnya.

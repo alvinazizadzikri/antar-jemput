@@ -102,15 +102,6 @@
             </div>
         </div>
 
-        <div class="col-lg-7">
-            <div class="page-card h-100">
-                <div class="card-body">
-                    <h5 class="fw-bold mb-3">Lokasi Anak</h5>
-
-                    <div id="map" class="map-box"></div>
-                </div>
-            </div>
-        </div>
 
     </div>
 
