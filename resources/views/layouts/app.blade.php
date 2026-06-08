@@ -161,17 +161,23 @@
                     @elseif(request()->is('riwayat*'))
                         Riwayat Antar Jemput
 
+                    @elseif(request()->is('izin-anak*'))
+                        Izin Anak
+
                     @elseif(request()->is('admin/drivers*'))
                         Data Sopir
 
                     @elseif(request()->is('admin/trips/create'))
                         Penugasan Sopir
 
-                    @elseif(request()->is('admin/trips'))
+                    @elseif(request()->is('admin/trips*'))
                         Riwayat Perjalanan
 
                     @elseif(request()->is('admin/transaksi*'))
                         Transaksi
+
+                    @elseif(request()->is('admin/izin-anak*'))
+                        Izin Anak
 
                     @elseif(request()->is('driver/jobs*'))
                         Tugas Sopir
