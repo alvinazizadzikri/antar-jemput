@@ -48,6 +48,7 @@
                                 ];
 
                                 $phoneNumber = $trip->driver->phone_number ?? null;
+                                $waPhone = null;
 
                                 if ($phoneNumber) {
                                     $cleanPhone = preg_replace('/[^0-9]/', '', $phoneNumber);
@@ -75,8 +76,8 @@
                                     {{ $trip->driver->user->name ?? '-' }}
                                 </td>
 
-                                <t$statd>
-                                    @if($phoneNumber)
+                                <td>
+                                    @if($phoneNumber && $waPhone)
                                         <a href="https://wa.me/{{ $waPhone }}" target="_blank"
                                             class="fw-bold text-success text-decoration-none">
                                             <i class="bi bi-whatsapp"></i>
@@ -85,29 +86,29 @@
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
-                                    </td>
+                                </td>
 
-                                    <td>
-                                        @if($trip->pickup_time)
-                                            {{ \Carbon\Carbon::parse($trip->pickup_time)->format('H:i') }}
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
+                                <td>
+                                    @if($trip->pickup_time)
+                                        {{ \Carbon\Carbon::parse($trip->pickup_time)->format('H:i') }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
 
-                                    <td>
-                                        @if($trip->dropoff_time)
-                                            {{ \Carbon\Carbon::parse($trip->dropoff_time)->format('H:i') }}
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
+                                <td>
+                                    @if($trip->dropoff_time)
+                                        {{ \Carbon\Carbon::parse($trip->dropoff_time)->format('H:i') }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
 
-                                    <td>
-                                        <span class="badge-status {{ $statusClass[$trip->status] ?? 'badge-assigned' }}">
-                                            {{ $statusText[$trip->status] ?? $trip->status }}
-                                        </span>
-                                    </td>
+                                <td>
+                                    <span class="badge-status {{ $statusClass[$trip->status] ?? 'badge-assigned' }}">
+                                        {{ $statusText[$trip->status] ?? $trip->status }}
+                                    </span>
+                                </td>
                             </tr>
 
                         @empty
