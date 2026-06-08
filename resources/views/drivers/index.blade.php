@@ -33,6 +33,7 @@
                         <tr>
                             <th>No</th>
                             <th>Nama</th>
+                            <th>No. Telepon</th>
                             <th>Email</th>
                             <th>Kendaraan</th>
                             <th>Plat</th>
@@ -50,6 +51,10 @@
                                     <div class="fw-bold">
                                         {{ $driver->user->name ?? '-' }}
                                     </div>
+                                </td>
+
+                                <td>
+                                    {{ $driver->phone_number ?? '-' }}
                                 </td>
 
                                 <td>{{ $driver->user->email ?? '-' }}</td>

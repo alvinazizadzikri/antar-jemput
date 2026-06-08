@@ -20,6 +20,7 @@
                         <tr>
                             <th>Anak</th>
                             <th>Sopir</th>
+                            <th>No. Telepon Sopir</th>
                             <th>Jam Jemput</th>
                             <th>Jam Antar</th>
                             <th>Status</th>
@@ -45,6 +46,18 @@
                                     'on_delivery' => 'badge-active',
                                     'completed' => 'badge-active',
                                 ];
+
+                                $phoneNumber = $trip->driver->phone_number ?? null;
+
+                                if ($phoneNumber) {
+                                    $cleanPhone = preg_replace('/[^0-9]/', '', $phoneNumber);
+
+                                    if (substr($cleanPhone, 0, 1) === '0') {
+                                        $waPhone = '62' . substr($cleanPhone, 1);
+                                    } else {
+                                        $waPhone = $cleanPhone;
+                                    }
+                                }
                             @endphp
 
                             <tr>
@@ -52,10 +65,26 @@
                                     <div class="fw-bold">
                                         {{ $trip->kid->name ?? '-' }}
                                     </div>
+
+                                    <small class="text-muted">
+                                        {{ $trip->kid->school_name ?? '-' }}
+                                    </small>
                                 </td>
 
                                 <td>
                                     {{ $trip->driver->user->name ?? '-' }}
+                                </td>
+
+                                <td>
+                                    @if($phoneNumber)
+                                        <a href="https://wa.me/{{ $waPhone }}" target="_blank"
+                                            class="fw-bold text-success text-decoration-none">
+                                            <i class="bi bi-whatsapp"></i>
+                                            {{ $phoneNumber }}
+                                        </a>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
                                 </td>
 
                                 <td>
@@ -83,7 +112,7 @@
 
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
+                                <td colspan="6" class="text-center text-muted py-4">
                                     Belum ada riwayat antar jemput
                                 </td>
                             </tr>

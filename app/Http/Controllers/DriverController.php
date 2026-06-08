@@ -41,6 +41,7 @@ class DriverController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
+            'phone_number' => 'required|string|max:20',
             'plate_number' => 'required|string|max:50|unique:drivers,plate_number',
             'capacity' => 'required|integer|min:1|max:20',
             'status' => 'required|in:online,offline',
@@ -58,6 +59,7 @@ class DriverController extends Controller
             Driver::create([
                 'user_id' => $user->id,
                 'vehicle_type' => 'Mobil',
+                 'phone_number' => $request->phone_number,
                 'plate_number' => strtoupper($request->plate_number),
                 'capacity' => $request->capacity,
                 'status' => $request->status,
@@ -105,6 +107,7 @@ class DriverController extends Controller
             ],
 
             'password' => 'nullable|string|min:6',
+            'phone_number' => 'required|string|max:20',
 
             'plate_number' => [
                 'required',
@@ -134,6 +137,7 @@ class DriverController extends Controller
             $driver->update([
                 'vehicle_type' => 'Mobil',
                 'plate_number' => strtoupper($request->plate_number),
+                'phone_number' => $request->phone_number,
                 'capacity' => $request->capacity,
                 'status' => $request->status,
             ]);

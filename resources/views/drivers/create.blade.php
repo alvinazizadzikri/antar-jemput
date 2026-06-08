@@ -60,6 +60,17 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label">Nomor Telepon Sopir</label>
+
+                <input type="text" name="phone_number" class="form-control" value="{{ old('phone_number') }}"
+                    placeholder="Contoh: 081234567890" required>
+
+                <small class="text-muted">
+                    Nomor ini dapat dilihat orang tua untuk kebutuhan komunikasi terkait antar jemput.
+                </small>
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">Jenis Kendaraan</label>
 
                 <input type="text" class="form-control" value="Mobil" readonly>
