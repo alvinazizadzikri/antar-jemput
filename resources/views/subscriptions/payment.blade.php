@@ -2,7 +2,7 @@
 
 @section('content')
 
-@include('components.subscription-info')
+    @include('components.subscription-info')
 
     <div class="section-header">
         <div>
@@ -119,15 +119,16 @@
                             </button>
                         </form>
                     @endif
+
+                @else
+                    <form action="{{ route('subscriptions.pay', $subscription->id) }}" method="POST">
+                        @csrf
+
+                        <button type="submit" class="btn btn-primary-custom w-100 mb-2">
+                            Lanjutkan ke Payment Gateway
+                        </button>
+                    </form>
                 @endif
-
-                <form action="{{ route('subscriptions.pay', $subscription->id) }}" method="POST">
-                    @csrf
-
-                    <button type="submit" class="btn btn-primary-custom w-100 mb-2">
-                        Lanjutkan ke Payment Gateway
-                    </button>
-                </form>
 
                 <a href="/subscriptions" class="btn btn-secondary-custom w-100">
                     Kembali ke Langganan
