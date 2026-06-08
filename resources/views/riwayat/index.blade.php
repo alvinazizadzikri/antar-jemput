@@ -33,17 +33,17 @@
                             @php
                                 $statusText = [
                                     'assigned' => 'Ditugaskan',
-                                    'on_pickup' => 'Menuju Jemput',
-                                    'picked' => 'Dijemput',
-                                    'on_delivery' => 'Diantar',
+                                    'picked_up' => 'Anak Dijemput',
+                                    'arrived_school' => 'Sampai Sekolah',
+                                    'picked_up_school' => 'Dijemput Pulang',
                                     'completed' => 'Selesai',
                                 ];
 
                                 $statusClass = [
                                     'assigned' => 'badge-assigned',
-                                    'on_pickup' => 'badge-pending',
-                                    'picked' => 'badge-active',
-                                    'on_delivery' => 'badge-active',
+                                    'picked_up' => 'badge-pending',
+                                    'arrived_school' => 'badge-active',
+                                    'picked_up_school' => 'badge-pending',
                                     'completed' => 'badge-active',
                                 ];
 
@@ -75,7 +75,7 @@
                                     {{ $trip->driver->user->name ?? '-' }}
                                 </td>
 
-                                <td>
+                                <t$statd>
                                     @if($phoneNumber)
                                         <a href="https://wa.me/{{ $waPhone }}" target="_blank"
                                             class="fw-bold text-success text-decoration-none">
@@ -85,29 +85,29 @@
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
-                                </td>
+                                    </td>
 
-                                <td>
-                                    @if($trip->pickup_time)
-                                        {{ \Carbon\Carbon::parse($trip->pickup_time)->format('H:i') }}
-                                    @else
-                                        -
-                                    @endif
-                                </td>
+                                    <td>
+                                        @if($trip->pickup_time)
+                                            {{ \Carbon\Carbon::parse($trip->pickup_time)->format('H:i') }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
 
-                                <td>
-                                    @if($trip->dropoff_time)
-                                        {{ \Carbon\Carbon::parse($trip->dropoff_time)->format('H:i') }}
-                                    @else
-                                        -
-                                    @endif
-                                </td>
+                                    <td>
+                                        @if($trip->dropoff_time)
+                                            {{ \Carbon\Carbon::parse($trip->dropoff_time)->format('H:i') }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
 
-                                <td>
-                                    <span class="badge-status {{ $statusClass[$trip->status] ?? 'badge-assigned' }}">
-                                        {{ $statusText[$trip->status] ?? $trip->status }}
-                                    </span>
-                                </td>
+                                    <td>
+                                        <span class="badge-status {{ $statusClass[$trip->status] ?? 'badge-assigned' }}">
+                                            {{ $statusText[$trip->status] ?? $trip->status }}
+                                        </span>
+                                    </td>
                             </tr>
 
                         @empty

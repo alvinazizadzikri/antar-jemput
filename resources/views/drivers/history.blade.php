@@ -37,17 +37,17 @@
                             @php
                                 $statusText = [
                                     'assigned' => 'Ditugaskan',
-                                    'on_pickup' => 'Menuju Jemput',
-                                    'picked' => 'Dijemput',
-                                    'on_delivery' => 'Diantar',
+                                    'picked_up' => 'Anak Dijemput',
+                                    'arrived_school' => 'Sampai Sekolah',
+                                    'picked_up_school' => 'Dijemput Pulang',
                                     'completed' => 'Selesai',
                                 ];
 
                                 $statusClass = [
                                     'assigned' => 'badge-assigned',
-                                    'on_pickup' => 'badge-pending',
-                                    'picked' => 'badge-active',
-                                    'on_delivery' => 'badge-active',
+                                    'picked_up' => 'badge-pending',
+                                    'arrived_school' => 'badge-active',
+                                    'picked_up_school' => 'badge-pending',
                                     'completed' => 'badge-active',
                                 ];
                             @endphp

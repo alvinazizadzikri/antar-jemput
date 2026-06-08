@@ -50,13 +50,26 @@
                     <label class="form-label">Status</label>
                     <select name="status" class="form-select">
                         <option value="">Semua Status</option>
-                        <option value="assigned" {{ request('status') == 'assigned' ? 'selected' : '' }}>Ditugaskan</option>
-                        <option value="on_pickup" {{ request('status') == 'on_pickup' ? 'selected' : '' }}>Menuju Jemput
+
+                        <option value="assigned" {{ request('status') == 'assigned' ? 'selected' : '' }}>
+                            Ditugaskan
                         </option>
-                        <option value="picked" {{ request('status') == 'picked' ? 'selected' : '' }}>Dijemput</option>
-                        <option value="on_delivery" {{ request('status') == 'on_delivery' ? 'selected' : '' }}>Diantar
+
+                        <option value="picked_up" {{ request('status') == 'picked_up' ? 'selected' : '' }}>
+                            Anak Dijemput
                         </option>
-                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
+
+                        <option value="arrived_school" {{ request('status') == 'arrived_school' ? 'selected' : '' }}>
+                            Sampai Sekolah
+                        </option>
+
+                        <option value="picked_up_school" {{ request('status') == 'picked_up_school' ? 'selected' : '' }}>
+                            Dijemput Pulang
+                        </option>
+
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>
+                            Selesai
+                        </option>
                     </select>
                 </div>
 
@@ -106,19 +119,20 @@
 
                                 $statusText = [
                                     'assigned' => 'Ditugaskan',
-                                    'on_pickup' => 'Menuju Jemput',
-                                    'picked' => 'Dijemput',
-                                    'on_delivery' => 'Diantar',
+                                    'picked_up' => 'Anak Dijemput',
+                                    'arrived_school' => 'Sampai Sekolah',
+                                    'picked_up_school' => 'Dijemput Pulang',
                                     'completed' => 'Selesai',
                                 ];
 
                                 $statusClass = [
                                     'assigned' => 'badge-assigned',
-                                    'on_pickup' => 'badge-pending',
-                                    'picked' => 'badge-active',
-                                    'on_delivery' => 'badge-active',
+                                    'picked_up' => 'badge-pending',
+                                    'arrived_school' => 'badge-active',
+                                    'picked_up_school' => 'badge-pending',
                                     'completed' => 'badge-active',
                                 ];
+                                ;
                             @endphp
 
                             <tr>

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\KidAbsence;
 use App\Models\Driver;
 use App\Models\Kid;
+use App\Models\KidAbsence;
 use App\Models\RiwayatAntarJemput;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,19 +17,19 @@ class RiwayatAntarJemputController extends Controller
     {
         return [
             'assigned',
-            'on_pickup',
-            'picked',
-            'on_delivery',
+            'picked_up',
+            'arrived_school',
+            'picked_up_school',
         ];
     }
 
     private function nextStatusMap(): array
     {
         return [
-            'assigned' => ['on_pickup'],
-            'on_pickup' => ['picked'],
-            'picked' => ['on_delivery'],
-            'on_delivery' => ['completed'],
+            'assigned' => ['picked_up'],
+            'picked_up' => ['arrived_school'],
+            'arrived_school' => ['picked_up_school'],
+            'picked_up_school' => ['completed'],
             'completed' => [],
         ];
     }
@@ -296,7 +296,7 @@ class RiwayatAntarJemputController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:assigned,on_pickup,picked,on_delivery,completed',
+            'status' => 'required|in:assigned,picked_up,arrived_school,picked_up_school,completed',
         ]);
 
         $driver = Driver::where('user_id', auth()->id())
@@ -324,7 +324,7 @@ class RiwayatAntarJemputController extends Controller
             'status' => $newStatus,
         ];
 
-        if ($newStatus === 'picked') {
+        if ($newStatus === 'picked_up') {
             $updateData['actual_pickup_time'] = now();
         }
 

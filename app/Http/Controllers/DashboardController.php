@@ -55,9 +55,9 @@ class DashboardController extends Controller
             $totalJobs = $jobs->count();
             $activeJobs = $jobs->whereIn('status', [
                 'assigned',
-                'on_pickup',
-                'picked',
-                'on_delivery',
+                'picked_up',
+                'arrived_school',
+                'picked_up_school',
             ])->count();
 
             return view('dashboard_driver', compact(

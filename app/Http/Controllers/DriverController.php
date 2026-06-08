@@ -59,7 +59,7 @@ class DriverController extends Controller
             Driver::create([
                 'user_id' => $user->id,
                 'vehicle_type' => 'Mobil',
-                 'phone_number' => $request->phone_number,
+                'phone_number' => $request->phone_number,
                 'plate_number' => strtoupper($request->plate_number),
                 'capacity' => $request->capacity,
                 'status' => $request->status,
@@ -158,9 +158,9 @@ class DriverController extends Controller
         $hasActiveTrip = RiwayatAntarJemput::where('driver_id', $driver->id)
             ->whereIn('status', [
                 'assigned',
-                'on_pickup',
-                'picked',
-                'on_delivery',
+                'picked_up',
+                'arrived_school',
+                'picked_up_school',
             ])
             ->exists();
 

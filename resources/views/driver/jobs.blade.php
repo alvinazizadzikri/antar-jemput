@@ -43,44 +43,44 @@
                     <tbody>
                         @forelse($tripGroups as $tripCode => $group)
 
-                            @php
-                                $firstTrip = $group->first();
+                           @php
+    $firstTrip = $group->first();
 
-                                $statusText = [
-                                    'assigned' => 'Ditugaskan',
-                                    'on_pickup' => 'Menuju Jemput',
-                                    'picked' => 'Dijemput',
-                                    'on_delivery' => 'Diantar',
-                                    'completed' => 'Selesai',
-                                ];
+    $statusText = [
+        'assigned' => 'Ditugaskan',
+        'picked_up' => 'Anak Dijemput',
+        'arrived_school' => 'Sampai Sekolah',
+        'picked_up_school' => 'Dijemput Pulang',
+        'completed' => 'Selesai',
+    ];
 
-                                $statusClass = [
-                                    'assigned' => 'badge-assigned',
-                                    'on_pickup' => 'badge-pending',
-                                    'picked' => 'badge-active',
-                                    'on_delivery' => 'badge-active',
-                                    'completed' => 'badge-active',
-                                ];
+    $statusClass = [
+        'assigned' => 'badge-assigned',
+        'picked_up' => 'badge-pending',
+        'arrived_school' => 'badge-active',
+        'picked_up_school' => 'badge-pending',
+        'completed' => 'badge-active',
+    ];
 
-                                $nextStatus = [
-                                    'assigned' => [
-                                        'value' => 'on_pickup',
-                                        'label' => 'Mulai Jemput',
-                                    ],
-                                    'on_pickup' => [
-                                        'value' => 'picked',
-                                        'label' => 'Anak Dijemput',
-                                    ],
-                                    'picked' => [
-                                        'value' => 'on_delivery',
-                                        'label' => 'Mulai Antar',
-                                    ],
-                                    'on_delivery' => [
-                                        'value' => 'completed',
-                                        'label' => 'Selesaikan',
-                                    ],
-                                ][$firstTrip->status] ?? null;
-                            @endphp
+    $nextStatus = [
+        'assigned' => [
+            'value' => 'picked_up',
+            'label' => 'Anak Dijemput',
+        ],
+        'picked_up' => [
+            'value' => 'arrived_school',
+            'label' => 'Sampai Sekolah',
+        ],
+        'arrived_school' => [
+            'value' => 'picked_up_school',
+            'label' => 'Jemput Pulang',
+        ],
+        'picked_up_school' => [
+            'value' => 'completed',
+            'label' => 'Sampai Rumah',
+        ],
+    ][$firstTrip->status] ?? null;
+@endphp
 
                             <tr>
                                 <td>
