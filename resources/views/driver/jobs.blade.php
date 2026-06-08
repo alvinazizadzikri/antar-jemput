@@ -33,6 +33,7 @@
                             <th>Kode Trip</th>
                             <th>Anak</th>
                             <th>Orang Tua</th>
+                            <th>Lokasi Jemput</th>
                             <th>Rencana Jemput</th>
                             <th>Aktual Jemput</th>
                             <th>Status</th>
@@ -43,44 +44,44 @@
                     <tbody>
                         @forelse($tripGroups as $tripCode => $group)
 
-                           @php
-    $firstTrip = $group->first();
+                            @php
+                                $firstTrip = $group->first();
 
-    $statusText = [
-        'assigned' => 'Ditugaskan',
-        'picked_up' => 'Anak Dijemput',
-        'arrived_school' => 'Sampai Sekolah',
-        'picked_up_school' => 'Dijemput Pulang',
-        'completed' => 'Selesai',
-    ];
+                                $statusText = [
+                                    'assigned' => 'Ditugaskan',
+                                    'picked_up' => 'Anak Dijemput',
+                                    'arrived_school' => 'Sampai Sekolah',
+                                    'picked_up_school' => 'Dijemput Pulang',
+                                    'completed' => 'Selesai',
+                                ];
 
-    $statusClass = [
-        'assigned' => 'badge-assigned',
-        'picked_up' => 'badge-pending',
-        'arrived_school' => 'badge-active',
-        'picked_up_school' => 'badge-pending',
-        'completed' => 'badge-active',
-    ];
+                                $statusClass = [
+                                    'assigned' => 'badge-assigned',
+                                    'picked_up' => 'badge-pending',
+                                    'arrived_school' => 'badge-active',
+                                    'picked_up_school' => 'badge-pending',
+                                    'completed' => 'badge-active',
+                                ];
 
-    $nextStatus = [
-        'assigned' => [
-            'value' => 'picked_up',
-            'label' => 'Anak Dijemput',
-        ],
-        'picked_up' => [
-            'value' => 'arrived_school',
-            'label' => 'Sampai Sekolah',
-        ],
-        'arrived_school' => [
-            'value' => 'picked_up_school',
-            'label' => 'Jemput Pulang',
-        ],
-        'picked_up_school' => [
-            'value' => 'completed',
-            'label' => 'Sampai Rumah',
-        ],
-    ][$firstTrip->status] ?? null;
-@endphp
+                                $nextStatus = [
+                                    'assigned' => [
+                                        'value' => 'picked_up',
+                                        'label' => 'Anak Dijemput',
+                                    ],
+                                    'picked_up' => [
+                                        'value' => 'arrived_school',
+                                        'label' => 'Sampai Sekolah',
+                                    ],
+                                    'arrived_school' => [
+                                        'value' => 'picked_up_school',
+                                        'label' => 'Jemput Pulang',
+                                    ],
+                                    'picked_up_school' => [
+                                        'value' => 'completed',
+                                        'label' => 'Sampai Rumah',
+                                    ],
+                                ][$firstTrip->status] ?? null;
+                            @endphp
 
                             <tr>
                                 <td>
@@ -95,7 +96,7 @@
 
                                 <td>
                                     @foreach($group as $trip)
-                                        <div class="fw-bold">
+                                        <div class="fw-bold mb-1">
                                             {{ $trip->kid->name ?? '-' }}
                                         </div>
                                     @endforeach
@@ -103,8 +104,34 @@
 
                                 <td>
                                     @foreach($group as $trip)
-                                        <div>
+                                        <div class="mb-1">
                                             {{ $trip->kid->parent->name ?? '-' }}
+                                        </div>
+                                    @endforeach
+                                </td>
+
+                                <td>
+                                    @foreach($group as $trip)
+                                        <div class="mb-2">
+                                            <div class="fw-semibold">
+                                                {{ $trip->kid->name ?? '-' }}
+                                            </div>
+
+                                            <small class="text-muted d-block">
+                                                {{ $trip->kid->address ?? '-' }}
+                                            </small>
+
+                                            @if(!is_null($trip->kid->latitude) && !is_null($trip->kid->longitude))
+                                                <a href="https://www.google.com/maps?q={{ $trip->kid->latitude }},{{ $trip->kid->longitude }}"
+                                                    target="_blank" class="btn btn-primary-custom btn-sm mt-1">
+                                                    <i class="bi bi-geo-alt-fill"></i>
+                                                    Buka Maps
+                                                </a>
+                                            @else
+                                                <span class="badge-status badge-danger">
+                                                    Lokasi belum ada
+                                                </span>
+                                            @endif
                                         </div>
                                     @endforeach
                                 </td>
@@ -153,7 +180,7 @@
 
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
+                                <td colspan="8" class="text-center text-muted py-4">
                                     Belum ada tugas sopir
                                 </td>
                             </tr>

@@ -108,17 +108,39 @@
                     <div class="card-body">
 
                         @forelse($kids as $kid)
-                            <div class="form-check mb-2">
-                                <input type="checkbox" name="kid_ids[]" value="{{ $kid->id }}" class="form-check-input"
-                                    id="kid_{{ $kid->id }}" {{ in_array($kid->id, old('kid_ids', [])) ? 'checked' : '' }}>
+                            <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+                                <div class="form-check">
+                                    <input type="checkbox" name="kid_ids[]" value="{{ $kid->id }}" class="form-check-input"
+                                        id="kid_{{ $kid->id }}" {{ in_array($kid->id, old('kid_ids', [])) ? 'checked' : '' }}>
 
-                                <label class="form-check-label" for="kid_{{ $kid->id }}">
-                                    <strong>{{ $kid->name }}</strong>
-                                    -
-                                    {{ $kid->parent->name ?? '-' }}
-                                    -
-                                    {{ $kid->school_name }}
-                                </label>
+                                    <label class="form-check-label" for="kid_{{ $kid->id }}">
+                                        <strong>{{ $kid->name }}</strong>
+                                        -
+                                        {{ $kid->parent->name ?? '-' }}
+                                        -
+                                        {{ $kid->school_name }}
+
+                                        <br>
+
+                                        <small class="text-muted">
+                                            Alamat: {{ $kid->address ?? '-' }}
+                                        </small>
+                                    </label>
+                                </div>
+
+                                <div class="text-end">
+                                    @if(!is_null($kid->latitude) && !is_null($kid->longitude))
+                                        <a href="https://www.google.com/maps?q={{ $kid->latitude }},{{ $kid->longitude }}"
+                                            target="_blank" class="btn btn-primary-custom btn-sm">
+                                            <i class="bi bi-geo-alt-fill"></i>
+                                            Lihat Lokasi
+                                        </a>
+                                    @else
+                                        <span class="badge-status badge-danger">
+                                            Lokasi belum ada
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                         @empty
                             <div class="text-muted text-center py-3">

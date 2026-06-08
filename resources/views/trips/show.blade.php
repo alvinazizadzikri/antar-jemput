@@ -139,6 +139,7 @@
                             <th>Alamat</th>
                             <th>Titik Jemput</th>
                             <th>Titik Antar</th>
+                            <th>Lokasi</th>
                             <th>Langganan</th>
                         </tr>
                     </thead>
@@ -182,6 +183,20 @@
                                 </td>
 
                                 <td>
+                                    @if(!is_null($item->kid->latitude) && !is_null($item->kid->longitude))
+                                        <a href="https://www.google.com/maps?q={{ $item->kid->latitude }},{{ $item->kid->longitude }}"
+                                            target="_blank" class="btn btn-primary-custom btn-sm">
+                                            <i class="bi bi-geo-alt-fill"></i>
+                                            Buka Maps
+                                        </a>
+                                    @else
+                                        <span class="badge-status badge-danger">
+                                            Lokasi belum ada
+                                        </span>
+                                    @endif
+                                </td>
+
+                                <td>
                                     @if($subscription)
                                         <span class="package-badge">
                                             {{ $subscription->package_name }}
@@ -196,7 +211,7 @@
 
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
+                                <td colspan="8" class="text-center text-muted py-4">
                                     Tidak ada anak dalam perjalanan ini
                                 </td>
                             </tr>
