@@ -30,6 +30,7 @@ class RiwayatAntarJemputController extends Controller
             'picked_up' => ['arrived_school'],
             'arrived_school' => ['picked_up_school'],
             'picked_up_school' => ['completed'],
+            'return_cancelled' => [],
             'completed' => [],
         ];
     }
@@ -296,7 +297,7 @@ class RiwayatAntarJemputController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:assigned,picked_up,arrived_school,picked_up_school,completed',
+            'status' => 'required|in:assigned,picked_up,arrived_school,picked_up_school,return_cancelled,completed',
         ]);
 
         $driver = Driver::where('user_id', auth()->id())
@@ -332,14 +333,16 @@ class RiwayatAntarJemputController extends Controller
             $updateData['dropoff_time'] = now();
         }
 
-        DB::transaction(function () use ($trip, $driver, $updateData) {
+        DB::transaction(function () use ($trip, $driver, $updateData, $currentStatus) {
             if ($trip->trip_code) {
                 RiwayatAntarJemput::where('driver_id', $driver->id)
                     ->where('trip_code', $trip->trip_code)
+                    ->where('status', $currentStatus)
                     ->update($updateData);
             } else {
                 RiwayatAntarJemput::where('driver_id', $driver->id)
                     ->where('id', $trip->id)
+                    ->where('status', $currentStatus)
                     ->update($updateData);
             }
         });

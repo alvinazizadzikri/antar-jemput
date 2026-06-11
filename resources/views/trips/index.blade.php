@@ -124,6 +124,7 @@
                                     'arrived_school' => 'Sampai Sekolah',
                                     'picked_up_school' => 'Dijemput Pulang',
                                     'completed' => 'Selesai',
+                                    'return_cancelled' => 'Tidak Ikut Jemput Pulang',
                                 ];
 
                                 $statusClass = [
@@ -132,6 +133,7 @@
                                     'arrived_school' => 'badge-active',
                                     'picked_up_school' => 'badge-pending',
                                     'completed' => 'badge-active',
+                                    'return_cancelled' => 'badge-danger',
                                 ];
 
                                 $tanggalPerjalanan = '-';
