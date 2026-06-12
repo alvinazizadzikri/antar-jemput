@@ -100,8 +100,11 @@ class KidController extends Controller
         return redirect('/kids')->with('success', 'Data anak berhasil diupdate');
     }
 
-    public function show(Kid $kid)
+    public function show($id)
     {
+        $kid = Kid::where('parent_id', Auth::id())
+            ->findOrFail($id);
+
         return view('kids.show', compact('kid'));
     }
 

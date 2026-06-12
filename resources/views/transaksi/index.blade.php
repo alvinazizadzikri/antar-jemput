@@ -43,6 +43,11 @@
 
                     <tbody>
                         @forelse($subscriptions as $subscription)
+
+                            @php
+                                $effectiveStatus = $subscription->effective_status;
+                            @endphp
+
                             <tr>
                                 <td>
                                     <div class="fw-bold">
@@ -69,114 +74,75 @@
                                 </td>
 
                                 <td>
-                                    @if($subscription->status == 'pending')
-
-                                        <span class="badge-status badge-pending">
-                                            Menunggu Pembayaran QRIS
-                                        </span>
-
-                                    @elseif($subscription->status == 'pending_cash')
-
-                                        <span class="badge-status badge-assigned">
-                                            Menunggu Pembayaran Cash
-                                        </span>
-
-                                    @elseif($subscription->status == 'paid')
-
-                                        <span class="badge-status badge-assigned">
-                                            Dibayar
-                                        </span>
-
-                                    @elseif($subscription->status == 'active')
-
-                                        <span class="badge-status badge-active">
-                                            Aktif
-                                        </span>
-
-                                    @elseif($subscription->status == 'cancelled')
-
-                                        <span class="badge-status badge-danger">
-                                            Dibatalkan
-                                        </span>
-
-                                    @else
-
-                                        <span class="badge-status badge-danger">
-                                            Expired
-                                        </span>
-
-                                    @endif
+                                    <span class="badge-status {{ $subscription->status_badge_class }}">
+                                        {{ $subscription->status_label }}
+                                    </span>
                                 </td>
 
                                 <td>
-
                                     {{ $subscription->created_at->format('d/m/Y H:i') }}
 
-                                    @if($subscription->status == 'pending_cash')
-
+                                    @if($effectiveStatus === 'pending_cash' && $subscription->cash_deadline)
                                         <br>
-
                                         <small class="text-danger">
                                             Tenggat:
                                             {{ \Carbon\Carbon::parse($subscription->cash_deadline)->format('d/m/Y H:i') }}
                                         </small>
-
                                     @endif
 
+                                    @if($subscription->start_date && $subscription->end_date)
+                                        <br>
+                                        <small class="text-muted">
+                                            Masa berlaku:
+                                            {{ \Carbon\Carbon::parse($subscription->start_date)->format('d/m/Y') }}
+                                            -
+                                            {{ \Carbon\Carbon::parse($subscription->end_date)->format('d/m/Y') }}
+                                        </small>
+                                    @endif
                                 </td>
 
                                 <td>
+                                    @if($effectiveStatus === 'pending')
+                                        <form action="{{ route('admin.transaksi.verifikasi', $subscription->id) }}" method="POST">
+                                            @csrf
 
-    @if($subscription->status == 'pending')
+                                            <button class="btn btn-success-custom btn-sm">
+                                                Verifikasi QRIS
+                                            </button>
+                                        </form>
 
-        <form
-            action="{{ route('admin.transaksi.verifikasi', $subscription->id) }}"
-            method="POST">
+                                    @elseif($effectiveStatus === 'pending_cash')
+                                        <form action="{{ route('admin.transaksi.verifyCash', $subscription->id) }}" method="POST">
+                                            @csrf
 
-            @csrf
+                                            <button class="btn btn-warning-custom btn-sm">
+                                                Verifikasi Cash
+                                            </button>
+                                        </form>
 
-            <button class="btn btn-success-custom btn-sm">
-                Verifikasi QRIS
-            </button>
+                                    @elseif($effectiveStatus === 'active')
+                                        <span class="table-action-text">
+                                            Sudah Aktif
+                                        </span>
 
-        </form>
+                                    @elseif($effectiveStatus === 'expired')
+                                        <span class="text-danger fw-bold">
+                                            Berakhir
+                                        </span>
 
-    @elseif($subscription->status == 'pending_cash')
+                                    @elseif($effectiveStatus === 'cancelled')
+                                        <span class="text-danger fw-bold">
+                                            Dibatalkan
+                                        </span>
 
-        <form
-            action="{{ route('admin.transaksi.verifyCash', $subscription->id) }}"
-            method="POST">
-
-            @csrf
-
-            <button class="btn btn-warning btn-sm">
-                Verifikasi Cash
-            </button>
-
-        </form>
-
-    @elseif($subscription->status == 'active')
-
-        <span class="table-action-text">
-            Sudah Aktif
-        </span>
-
-    @elseif($subscription->status == 'cancelled')
-
-        <span class="text-danger">
-            Dibatalkan
-        </span>
-
-    @else
-
-        <span class="table-action-text">
-            -
-        </span>
-
-    @endif
-
-</td>
+                                    @else
+                                        <span class="table-action-text">
+                                            -
+                                        </span>
+                                    @endif
+                                </td>
                             </tr>
+
                         @empty
                             <tr>
                                 <td colspan="8" class="text-center text-muted py-4">

@@ -37,20 +37,24 @@ class Kid extends Model
     {
         return $this->hasOne(Subscription::class)
             ->where('status', 'active')
+            ->whereDate('start_date', '<=', now()->toDateString())
+            ->whereDate('end_date', '>=', now()->toDateString())
             ->latestOfMany();
     }
 
     public function activeSubscription()
     {
         return $this->hasOne(Subscription::class)
-            ->whereIn(
-                'status',
-                [
+            ->where(function ($query) {
+                $query->whereIn('status', [
                     'pending',
                     'pending_cash',
-                    'active',
-                ]
-            )
+                ])
+                    ->orWhere(function ($query) {
+                        $query->where('status', 'active')
+                            ->whereDate('end_date', '>=', now()->toDateString());
+                    });
+            })
             ->latestOfMany();
     }
 

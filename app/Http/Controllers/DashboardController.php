@@ -13,11 +13,16 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+        Subscription::syncExpired();
 
         if ($user->role == 'parent') {
             $kids = $user->kids ?? collect();
             $subscriptions = $user->subscriptions ?? collect();
-            $activeSubscriptions = $subscriptions->where('status', 'active')->count();
+            $activeSubscriptions = $subscriptions
+                ->filter(function ($subscription) {
+                    return $subscription->isActiveToday();
+                })
+                ->count();
 
             return view('dashboard', compact(
                 'kids',
@@ -29,7 +34,10 @@ class DashboardController extends Controller
         if ($user->role == 'admin') {
             $totalKids = Kid::count();
             $totalDrivers = Driver::count();
-            $totalSubscriptions = Subscription::where('status', 'active')->count();
+            $totalSubscriptions = Subscription::where('status', 'active')
+                ->whereDate('start_date', '<=', now()->toDateString())
+                ->whereDate('end_date', '>=', now()->toDateString())
+                ->count();
             $totalTrips = RiwayatAntarJemput::count();
 
             return view('dashboard_admin', compact(

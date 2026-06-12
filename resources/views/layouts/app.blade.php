@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
     {{-- Theme Global --}}
-    <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
 </head>
 
 <body>
@@ -106,6 +106,13 @@
                     </li>
 
                     <li class="nav-item">
+                        <a href="/admin/packages" class="nav-link {{ request()->is('admin/packages*') ? 'active' : '' }}">
+                            <i class="bi bi-tags"></i>
+                            Paket Langganan
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a href="/admin/izin-anak" class="nav-link {{ request()->is('admin/izin-anak*') ? 'active' : '' }}">
                             <i class="bi bi-calendar-x"></i>
                             Izin Anak
@@ -151,6 +158,9 @@
 
                     @elseif(request()->is('kids*'))
                         Data Anak
+
+                    @elseif(request()->is('admin/packages*'))
+                        Paket Langganan
 
                     @elseif(request()->is('subscriptions/*/payment'))
                         Pembayaran
