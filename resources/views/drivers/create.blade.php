@@ -98,19 +98,6 @@
                 </small>
             </div>
 
-            <div class="mb-4">
-                <label class="form-label">Status</label>
-
-                <select name="status" class="form-select" required>
-                    <option value="online" {{ old('status') == 'online' ? 'selected' : '' }}>
-                        Online
-                    </option>
-
-                    <option value="offline" {{ old('status') == 'offline' ? 'selected' : '' }}>
-                        Offline
-                    </option>
-                </select>
-            </div>
 
             <div class="form-action-row">
                 <button class="btn btn-primary-custom">

@@ -17,7 +17,7 @@ class DriverController extends Controller
      */
     public function index()
     {
-        $drivers = Driver::with('user')
+        $drivers = Driver::with(['user', 'trips'])
             ->latest()
             ->get();
 
@@ -44,7 +44,6 @@ class DriverController extends Controller
             'phone_number' => 'required|string|max:20',
             'plate_number' => 'required|string|max:50|unique:drivers,plate_number',
             'capacity' => 'required|integer|min:1|max:20',
-            'status' => 'required|in:online,offline',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -62,7 +61,13 @@ class DriverController extends Controller
                 'phone_number' => $request->phone_number,
                 'plate_number' => strtoupper($request->plate_number),
                 'capacity' => $request->capacity,
-                'status' => $request->status,
+
+                /*
+                 * Status tidak lagi diinput manual dari form.
+                 * Sopir baru otomatis dibuat dalam status online agar bisa dipilih
+                 * pada menu penugasan sopir.
+                 */
+                'status' => 'online',
             ]);
 
         });
@@ -117,7 +122,6 @@ class DriverController extends Controller
             ],
 
             'capacity' => 'required|integer|min:1|max:20',
-            'status' => 'required|in:online,offline',
         ]);
 
         DB::transaction(function () use ($request, $driver) {
@@ -139,7 +143,11 @@ class DriverController extends Controller
                 'plate_number' => strtoupper($request->plate_number),
                 'phone_number' => $request->phone_number,
                 'capacity' => $request->capacity,
-                'status' => $request->status,
+
+                /*
+                 * Status tidak diubah lewat form edit.
+                 * Status tetap dikelola sebagai kondisi operasional sistem.
+                 */
             ]);
 
         });
