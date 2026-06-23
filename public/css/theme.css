@@ -1757,3 +1757,504 @@ textarea.form-control:focus {
         height: 300px !important;
     }
 }
+
+/* =========================================================
+   MOBILE UI REFINEMENT - FINAL
+   Tempel di paling bawah public/css/theme.css
+========================================================= */
+
+html,
+body {
+    overflow-x: hidden;
+}
+
+body {
+    -webkit-text-size-adjust: 100%;
+}
+
+.main-content {
+    overflow-x: hidden;
+}
+
+/* Supaya iPhone tidak terlalu mepet bawah */
+.page-wrapper {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+}
+
+/* =========================
+   TOPBAR MOBILE
+========================= */
+.mobile-menu-btn,
+.sidebar-close-btn {
+    transition: all 0.2s ease;
+}
+
+.mobile-menu-btn:active,
+.sidebar-close-btn:active {
+    transform: scale(0.96);
+}
+
+@media (max-width: 992px) {
+    .topbar {
+        padding: 10px 14px !important;
+        min-height: 66px;
+        gap: 10px;
+    }
+
+    .mobile-menu-btn {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 12px;
+        font-size: 21px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .topbar .d-flex.align-items-center.gap-3 {
+        gap: 10px !important;
+    }
+
+    .user-topbar-name {
+        font-size: 14px;
+        max-width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .topbar .btn-danger-custom,
+    .topbar .btn.btn-danger-custom,
+    .topbar a.btn-danger-custom {
+        padding: 9px 14px !important;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1;
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .topbar {
+        padding: 10px 12px !important;
+        min-height: 62px;
+    }
+
+    .user-topbar-name {
+        display: none !important;
+    }
+
+    .topbar .btn-danger-custom,
+    .topbar .btn.btn-danger-custom,
+    .topbar a.btn-danger-custom {
+        padding: 8px 12px !important;
+        font-size: 13px;
+        min-height: 40px;
+        border-radius: 12px;
+    }
+
+    .mobile-menu-btn {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        font-size: 20px;
+    }
+}
+
+/* =========================
+   SIDEBAR MOBILE
+========================= */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+        padding: 18px 14px;
+    }
+
+    .sidebar-brand {
+        font-size: 22px;
+    }
+
+    .sidebar .nav-link {
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
+    .sidebar .nav-link i {
+        font-size: 16px;
+    }
+
+    .sidebar-close-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar {
+        width: 82vw !important;
+        min-width: 82vw !important;
+        max-width: 82vw !important;
+    }
+
+    .sidebar .nav-link {
+        font-size: 14px;
+        padding: 11px 13px;
+    }
+}
+
+/* =========================
+   PAGE / HEADER MOBILE
+========================= */
+@media (max-width: 992px) {
+    .page-wrapper {
+        padding: 18px 14px 90px !important;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .section-header > div:first-child {
+        width: 100%;
+    }
+
+    .page-title {
+        font-size: 21px !important;
+        line-height: 1.2 !important;
+        margin-bottom: 6px !important;
+    }
+
+    .page-subtitle {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        color: #b9c3d6 !important;
+        margin-bottom: 0 !important;
+    }
+
+    .header-actions {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .header-actions .btn,
+    .header-actions a {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-wrapper {
+        padding: 16px 12px 96px !important;
+    }
+
+    .page-title {
+        font-size: 19px !important;
+    }
+
+    .page-subtitle {
+        font-size: 13px !important;
+    }
+}
+
+/* =========================
+   CARD / PANEL MOBILE
+========================= */
+@media (max-width: 992px) {
+    .page-card,
+    .form-card,
+    .profile-card,
+    .search-card,
+    .stat-card,
+    .payment-card,
+    .qris-card {
+        border-radius: 16px !important;
+        overflow: hidden;
+    }
+
+    .page-card .card-body {
+        padding: 14px !important;
+    }
+
+    .form-card,
+    .profile-card {
+        padding: 16px !important;
+    }
+
+    .form-section-title {
+        font-size: 17px !important;
+        line-height: 1.3;
+        margin-bottom: 16px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-card .card-body {
+        padding: 12px !important;
+    }
+
+    .form-card,
+    .profile-card {
+        padding: 14px !important;
+    }
+
+    .form-section-title {
+        font-size: 16px !important;
+    }
+}
+
+/* =========================
+   FORM MOBILE
+========================= */
+@media (max-width: 992px) {
+    .form-label {
+        font-size: 14px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .form-control,
+    .form-select,
+    textarea.form-control {
+        min-height: 46px;
+        padding: 11px 13px !important;
+        font-size: 14px !important;
+        border-radius: 12px !important;
+    }
+
+    textarea.form-control {
+        min-height: 110px;
+    }
+
+    .text-muted,
+    small.text-muted,
+    .form-text {
+        font-size: 12px !important;
+        line-height: 1.6 !important;
+        color: #aeb7c8 !important;
+    }
+
+    .mb-3,
+    .mb-4 {
+        margin-bottom: 16px !important;
+    }
+
+    .form-action-row {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        margin-top: 6px;
+    }
+
+    .form-action-row .btn,
+    .form-action-row a {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .btn-primary-custom,
+    .btn-secondary-custom,
+    .btn-success-custom,
+    .btn-warning-custom,
+    .btn-danger-custom {
+        min-height: 44px;
+        border-radius: 12px !important;
+        font-size: 14px !important;
+    }
+}
+
+/* =========================
+   FILTER / SEARCH MOBILE
+========================= */
+@media (max-width: 992px) {
+    .search-card,
+    .filter-card {
+        padding: 14px !important;
+        border-radius: 16px !important;
+    }
+
+    .search-card .row,
+    .filter-card .row {
+        row-gap: 12px !important;
+    }
+
+    .search-card .btn,
+    .filter-card .btn {
+        min-height: 44px;
+        border-radius: 12px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .search-card .btn,
+    .filter-card .btn {
+        width: 100%;
+    }
+}
+
+/* Supaya tombol filter & reset rapi */
+@media (max-width: 992px) {
+    .search-card .d-flex,
+    .filter-card .d-flex {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+}
+
+/* =========================
+   TABLE MOBILE
+========================= */
+@media (max-width: 992px) {
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 14px;
+        padding-bottom: 4px;
+    }
+
+    .custom-table {
+        min-width: 720px;
+        margin-bottom: 0 !important;
+    }
+
+    .custom-table thead th {
+        font-size: 13px !important;
+        padding: 12px 12px !important;
+        white-space: nowrap;
+    }
+
+    .custom-table tbody td {
+        font-size: 13px !important;
+        padding: 11px 12px !important;
+        vertical-align: middle;
+    }
+
+    .icon-action-group {
+        gap: 6px !important;
+        flex-wrap: nowrap;
+    }
+
+    .icon-btn {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        border-radius: 10px;
+    }
+
+    .badge-status,
+    .package-badge {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+        border-radius: 999px !important;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 576px) {
+    .custom-table {
+        min-width: 680px;
+    }
+}
+
+/* =========================
+   ALERT / INFO BOX MOBILE
+========================= */
+@media (max-width: 992px) {
+    .alert,
+    .info-alert-custom {
+        padding: 12px 14px !important;
+        border-radius: 14px !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+    }
+
+    .alert ul {
+        padding-left: 18px;
+        margin-bottom: 0;
+    }
+}
+
+/* =========================
+   DASHBOARD / CARD STAT
+========================= */
+@media (max-width: 992px) {
+    .stat-card {
+        padding: 14px !important;
+    }
+
+    .stat-card-value {
+        font-size: 24px !important;
+    }
+
+    .stat-card-icon {
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 20px !important;
+    }
+}
+
+/* =========================
+   MAP MOBILE
+========================= */
+@media (max-width: 992px) {
+    .map-box,
+    .map-form-box {
+        height: 260px !important;
+        border-radius: 14px !important;
+        overflow: hidden;
+    }
+
+    .map-show-box {
+        height: 300px !important;
+        border-radius: 14px !important;
+        overflow: hidden;
+    }
+}
+
+/* =========================
+   EXTRA SMALL CLEANUP
+========================= */
+@media (max-width: 576px) {
+    .section-header {
+        margin-bottom: 16px;
+    }
+
+    .page-card,
+    .form-card,
+    .profile-card,
+    .search-card {
+        border-radius: 14px !important;
+    }
+
+    .custom-table thead th,
+    .custom-table tbody td {
+        font-size: 12.5px !important;
+    }
+
+    .text-muted,
+    small.text-muted,
+    .form-text {
+        font-size: 11.5px !important;
+    }
+}
