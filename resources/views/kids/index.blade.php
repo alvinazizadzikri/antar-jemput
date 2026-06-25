@@ -101,9 +101,17 @@
                                 <td>
                                     <div class="icon-action-group">
 
-                                        <a href="/kids/{{ $k->id }}" class="icon-btn icon-btn-info" title="Lihat Lokasi">
-                                            <i class="bi bi-geo-alt-fill"></i>
-                                        </a>
+                                        @if(!is_null($k->latitude) && !is_null($k->longitude))
+                                            <a href="https://www.google.com/maps?q={{ $k->latitude }},{{ $k->longitude }}"
+                                                target="_blank" rel="noopener" class="icon-btn icon-btn-info"
+                                                title="Buka Google Maps">
+                                                <i class="bi bi-geo-alt-fill"></i>
+                                            </a>
+                                        @else
+                                            <span class="icon-btn icon-btn-danger" title="Lokasi belum tersedia">
+                                                <i class="bi bi-geo-alt-slash-fill"></i>
+                                            </span>
+                                        @endif
 
                                         <a href="/kids/{{ $k->id }}/edit" class="icon-btn icon-btn-warning" title="Edit Data">
                                             <i class="bi bi-pencil-fill"></i>

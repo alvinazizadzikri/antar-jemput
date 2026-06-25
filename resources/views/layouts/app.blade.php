@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
     {{-- Theme Global --}}
-    <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}">
 </head>
 
 <body>
@@ -24,10 +24,16 @@
     <div class="app-shell">
 
         {{-- SIDEBAR --}}
-        <aside class="sidebar">
+        <aside class="sidebar" id="appSidebar">
 
-            <div class="sidebar-brand">
-                Antar Jemput
+            <div class="sidebar-mobile-header">
+                <div class="sidebar-brand">
+                    Antar Jemput
+                </div>
+
+                <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Tutup menu">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
 
             <ul class="nav flex-column">
@@ -106,6 +112,13 @@
                     </li>
 
                     <li class="nav-item">
+                        <a href="/admin/packages" class="nav-link {{ request()->is('admin/packages*') ? 'active' : '' }}">
+                            <i class="bi bi-tags"></i>
+                            Paket Langganan
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a href="/admin/izin-anak" class="nav-link {{ request()->is('admin/izin-anak*') ? 'active' : '' }}">
                             <i class="bi bi-calendar-x"></i>
                             Izin Anak
@@ -138,62 +151,22 @@
 
         </aside>
 
+        {{-- MOBILE OVERLAY --}}
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
         {{-- MAIN CONTENT --}}
         <main class="main-content flex-grow-1">
 
             {{-- TOPBAR --}}
             <div class="topbar d-flex justify-content-between align-items-center">
 
-                <div class="topbar-title">
+                <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Buka menu">
+                    <i class="bi bi-list"></i>
+                </button>
 
-                    @if(request()->is('dashboard'))
-                        Dashboard
+                <div class="d-flex align-items-center gap-3 ms-auto">
 
-                    @elseif(request()->is('kids*'))
-                        Data Anak
-
-                    @elseif(request()->is('subscriptions/*/payment'))
-                        Pembayaran
-
-                    @elseif(request()->is('subscriptions*'))
-                        Langganan
-
-                    @elseif(request()->is('riwayat*'))
-                        Riwayat Antar Jemput
-
-                    @elseif(request()->is('izin-anak*'))
-                        Izin Anak
-
-                    @elseif(request()->is('admin/drivers*'))
-                        Data Sopir
-
-                    @elseif(request()->is('admin/trips/create'))
-                        Penugasan Sopir
-
-                    @elseif(request()->is('admin/trips*'))
-                        Riwayat Perjalanan
-
-                    @elseif(request()->is('admin/transaksi*'))
-                        Transaksi
-
-                    @elseif(request()->is('admin/izin-anak*'))
-                        Izin Anak
-
-                    @elseif(request()->is('driver/jobs*'))
-                        Tugas Sopir
-
-                    @elseif(request()->is('profile'))
-                        Profil
-
-                    @else
-                        Antar Jemput
-                    @endif
-
-                </div>
-
-                <div class="d-flex align-items-center gap-3">
-
-                    <span class="fw-semibold">
+                    <span class="fw-semibold user-topbar-name">
                         {{ auth()->user()->name ?? 'User' }}
                     </span>
 
@@ -219,6 +192,51 @@
 
     {{-- Leaflet JS untuk Map --}}
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    {{-- Mobile Sidebar Script --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const body = document.body;
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            const closeBtn = document.getElementById('sidebarCloseBtn');
+            const overlay = document.getElementById('sidebarOverlay');
+            const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+
+            function openSidebar() {
+                body.classList.add('sidebar-open');
+            }
+
+            function closeSidebar() {
+                body.classList.remove('sidebar-open');
+            }
+
+            if (menuBtn) {
+                menuBtn.addEventListener('click', openSidebar);
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeSidebar);
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebar);
+            }
+
+            sidebarLinks.forEach(function (link) {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth <= 992) {
+                        closeSidebar();
+                    }
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 992) {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
 
 </body>
 

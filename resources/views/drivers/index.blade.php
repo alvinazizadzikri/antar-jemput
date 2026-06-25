@@ -6,7 +6,7 @@
         <div>
             <div class="page-title">Data Sopir</div>
             <div class="page-subtitle">
-                Kelola data sopir, kendaraan, plat nomor, dan status ketersediaan
+                Kelola data sopir, kendaraan, plat nomor, dan status operasional
             </div>
         </div>
 
@@ -21,6 +21,12 @@
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
         </div>
     @endif
 
@@ -57,18 +63,26 @@
                                     {{ $driver->phone_number ?? '-' }}
                                 </td>
 
-                                <td>{{ $driver->user->email ?? '-' }}</td>
+                                <td>
+                                    {{ $driver->user->email ?? '-' }}
+                                </td>
 
-                                <td>{{ $driver->vehicle_type }}</td>
+                                <td>
+                                    {{ $driver->vehicle_type ?? '-' }}
+                                </td>
 
                                 <td>
                                     <span class="package-badge">
-                                        {{ $driver->plate_number }}
+                                        {{ $driver->plate_number ?? '-' }}
                                     </span>
                                 </td>
 
                                 <td>
-                                    @if($driver->status == 'online')
+                                    @if($driver->status_label === 'On Trip')
+                                        <span class="badge-status" style="background: #fff3cd; color: #856404;">
+                                            On Trip
+                                        </span>
+                                    @elseif($driver->status_label === 'Online')
                                         <span class="badge-status badge-active">
                                             Online
                                         </span>
@@ -92,12 +106,12 @@
                                             <i class="bi bi-clock-history"></i>
                                         </a>
 
-                                        <form action="/admin/drivers/{{ $driver->id }}" method="POST">
+                                        <form action="/admin/drivers/{{ $driver->id }}" method="POST"
+                                            onsubmit="return confirm('Yakin hapus sopir?')">
                                             @csrf
                                             @method('DELETE')
 
-                                            <button type="submit" class="icon-btn icon-btn-danger"
-                                                onclick="return confirm('Yakin hapus sopir?')" title="Hapus Sopir">
+                                            <button type="submit" class="icon-btn icon-btn-danger" title="Hapus Sopir">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
                                         </form>
@@ -107,7 +121,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
+                                <td colspan="8" class="text-center text-muted py-4">
                                     Belum ada data sopir
                                 </td>
                             </tr>

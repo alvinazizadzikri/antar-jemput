@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class ProfileController extends Controller
 {
@@ -15,46 +16,45 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        ini_set('memory_limit', '1024M');
+
         $user = Auth::user();
 
+        // ❌ HAPUS LIMIT 2MB
         $request->validate([
             'name' => 'required',
             'email' => 'required|email',
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:244',
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp',
         ]);
 
-        // UPDATE DATA
         $user->name = $request->name;
         $user->email = $request->email;
 
-        // UPLOAD FOTO
         if ($request->hasFile('avatar')) {
 
-            // hapus foto lama
+            // hapus lama
             if ($user->avatar) {
-
                 Storage::disk('public')->delete($user->avatar);
-
             }
 
-            // ambil file
             $file = $request->file('avatar');
 
-            // nama file unik
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            $filename = time().'.jpg';
+            $path = 'avatars/'.$filename;
 
-            // simpan file
-            $file->storeAs('avatars', $filename, 'public');
+            $image = Image::make($file->getPathname())
+                ->resize(1200, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })
+                ->encode('jpg', 75);
 
-            // simpan path ke database
-            $user->avatar = 'avatars/'.$filename;
+            Storage::disk('public')->put($path, (string) $image);
+
+            $user->avatar = $path;
         }
 
-        // SIMPAN USER
         $user->save();
-
-        // DEBUG
-        // dd($user);
 
         return back()->with('success', 'Profil berhasil diperbarui');
     }

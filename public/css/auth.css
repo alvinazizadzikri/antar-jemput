@@ -318,4 +318,353 @@ body.welcome-body::after {
         font-size: 76px;
         margin-top: 28px;
     }
+
+    /* ===============================
+   DARK THEME AUTH & WELCOME
+   Untuk Login, Register, Welcome
+================================ */
+
+    /* ===== AUTH BODY LOGIN / REGISTER ===== */
+
+    .auth-body {
+        min-height: 100vh !important;
+        background:
+            radial-gradient(circle at top right, rgba(37, 99, 235, 0.14), transparent 30%),
+            radial-gradient(circle at bottom left, rgba(30, 64, 175, 0.16), transparent 35%),
+            linear-gradient(135deg, #050814 0%, #08111f 45%, #050814 100%) !important;
+        color: #f8fbff !important;
+    }
+
+    /* Card login/register */
+    .auth-card {
+        background: linear-gradient(180deg, #111827 0%, #0f172a 100%) !important;
+        border: 1px solid #263348 !important;
+        color: #f8fbff !important;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45) !important;
+    }
+
+    /* Header auth */
+    .auth-header h2 {
+        color: #f8fbff !important;
+    }
+
+    .auth-header p {
+        color: #9caec7 !important;
+    }
+
+    /* Icon besar auth */
+    .auth-logo {
+        background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+        color: #ffffff !important;
+        box-shadow: 0 18px 40px rgba(37, 99, 235, 0.30) !important;
+    }
+
+    /* Label */
+    .auth-label {
+        color: #f8fbff !important;
+        font-weight: 700 !important;
+    }
+
+    /* Input group */
+    .auth-input-group .input-group-text {
+        background: rgba(59, 130, 246, 0.12) !important;
+        border: 1px solid #263348 !important;
+        color: #93c5fd !important;
+    }
+
+    .auth-input-group .form-control {
+        background: #0b1324 !important;
+        border: 1px solid #263348 !important;
+        color: #f8fbff !important;
+    }
+
+    .auth-input-group .form-control::placeholder {
+        color: #7f91aa !important;
+    }
+
+    .auth-input-group .form-control:focus {
+        background: #101827 !important;
+        color: #ffffff !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.18) !important;
+    }
+
+    /* Button login/register */
+    .auth-btn {
+        background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: 0 16px 34px rgba(37, 99, 235, 0.28) !important;
+    }
+
+    .auth-btn:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e3a8a) !important;
+        color: #ffffff !important;
+    }
+
+    /* Link auth */
+    .auth-link {
+        color: #60a5fa !important;
+        font-weight: 800 !important;
+    }
+
+    .auth-link:hover {
+        color: #93c5fd !important;
+    }
+
+    /* Text bawah form */
+    .auth-body-content,
+    .auth-body-content .text-center {
+        color: #cbd7ea !important;
+    }
+
+    /* Alert */
+    .auth-body .alert-danger {
+        background: rgba(239, 68, 68, 0.14) !important;
+        border: 1px solid rgba(239, 68, 68, 0.28) !important;
+        color: #fca5a5 !important;
+        border-radius: 14px !important;
+    }
+
+    /* ===== WELCOME PAGE ===== */
+
+    .welcome-body {
+        min-height: 100vh !important;
+        background:
+            radial-gradient(circle at top right, rgba(37, 99, 235, 0.14), transparent 30%),
+            radial-gradient(circle at bottom left, rgba(30, 64, 175, 0.16), transparent 35%),
+            linear-gradient(135deg, #050814 0%, #08111f 45%, #050814 100%) !important;
+        color: #f8fbff !important;
+    }
+
+    /* Navbar welcome */
+    .welcome-nav {
+        background: transparent !important;
+    }
+
+    .welcome-brand {
+        color: #f8fbff !important;
+        font-weight: 800 !important;
+    }
+
+    .welcome-brand::after {
+        content: "";
+        display: block;
+        width: 54px;
+        height: 4px;
+        margin-top: 8px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #2563eb, transparent);
+    }
+
+    /* Hero card */
+    .welcome-hero-card {
+        background: linear-gradient(180deg, #111827 0%, #0f172a 100%) !important;
+        border: 1px solid #263348 !important;
+        color: #f8fbff !important;
+        box-shadow: 0 26px 70px rgba(0, 0, 0, 0.46) !important;
+    }
+
+    /* Badge */
+    .welcome-badge {
+        background: rgba(59, 130, 246, 0.16) !important;
+        color: #bfdbfe !important;
+        border: 1px solid rgba(59, 130, 246, 0.24) !important;
+    }
+
+    /* Judul dan subtitle */
+    .welcome-title {
+        color: #f8fbff !important;
+    }
+
+    .welcome-subtitle {
+        color: #9caec7 !important;
+    }
+
+    /* Feature */
+    .welcome-feature {
+        color: #f8fbff !important;
+    }
+
+    .welcome-feature .fw-bold {
+        color: #f8fbff !important;
+    }
+
+    .welcome-feature .text-muted {
+        color: #9caec7 !important;
+    }
+
+    .welcome-feature-icon {
+        background: rgba(59, 130, 246, 0.14) !important;
+        color: #93c5fd !important;
+    }
+
+    /* Ilustrasi bus */
+    .welcome-illustration {
+        background: linear-gradient(135deg, #1e40af, #3b82f6) !important;
+        color: #ffffff !important;
+        box-shadow: 0 24px 60px rgba(37, 99, 235, 0.32) !important;
+    }
+
+    /* Button welcome */
+    .welcome-btn-primary {
+        background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: 0 14px 30px rgba(37, 99, 235, 0.26) !important;
+    }
+
+    .welcome-btn-primary:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e3a8a) !important;
+        color: #ffffff !important;
+    }
+
+    .welcome-btn-light {
+        background: #111827 !important;
+        color: #f8fbff !important;
+        border: 1px solid #263348 !important;
+    }
+
+    .welcome-btn-light:hover {
+        background: #152033 !important;
+        color: #ffffff !important;
+    }
+
+    /* Extra fallback agar tidak ada bagian putih */
+    .auth-body .bg-white,
+    .welcome-body .bg-white {
+        background: #111827 !important;
+    }
+
+    .auth-body .text-dark,
+    .welcome-body .text-dark {
+        color: #f8fbff !important;
+    }
+
+    .auth-body .text-muted,
+    .welcome-body .text-muted {
+        color: #9caec7 !important;
+    }
+}
+
+/* ===============================
+   FORCE DARK AUTH FIX
+   WAJIB DI LUAR @media
+================================ */
+
+body.auth-body,
+body.welcome-body {
+    min-height: 100vh !important;
+    background:
+        radial-gradient(circle at top right, rgba(37, 99, 235, 0.18), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(30, 64, 175, 0.18), transparent 35%),
+        linear-gradient(135deg, #050814 0%, #08111f 45%, #050814 100%) !important;
+    color: #f8fbff !important;
+}
+
+body.auth-body::before,
+body.welcome-body::before {
+    background: rgba(37, 99, 235, 0.08) !important;
+}
+
+body.auth-body::after,
+body.welcome-body::after {
+    background: rgba(30, 64, 175, 0.14) !important;
+}
+
+.auth-card,
+.welcome-hero-card {
+    background: linear-gradient(180deg, #111827 0%, #0f172a 100%) !important;
+    border: 1px solid #263348 !important;
+    color: #f8fbff !important;
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.48) !important;
+}
+
+.auth-header h2,
+.auth-label,
+.welcome-title,
+.welcome-brand,
+.welcome-feature .fw-bold {
+    color: #f8fbff !important;
+}
+
+.auth-header p,
+.welcome-subtitle,
+.welcome-feature .text-muted,
+.auth-body-content,
+.auth-body-content .text-center {
+    color: #9caec7 !important;
+}
+
+.auth-logo,
+.welcome-illustration,
+.auth-btn,
+.welcome-btn-primary {
+    background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.auth-input-group {
+    background: #0b1324 !important;
+    border: 1px solid #263348 !important;
+}
+
+.auth-input-group .input-group-text {
+    background: rgba(59, 130, 246, 0.12) !important;
+    border: none !important;
+    color: #93c5fd !important;
+}
+
+.auth-input-group .form-control {
+    background: #0b1324 !important;
+    border: none !important;
+    color: #f8fbff !important;
+}
+
+.auth-input-group .form-control::placeholder {
+    color: #7f91aa !important;
+}
+
+.auth-input-group .form-control:focus {
+    background: #101827 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+.auth-link {
+    color: #60a5fa !important;
+    font-weight: 800 !important;
+}
+
+.auth-link:hover {
+    color: #93c5fd !important;
+}
+
+.welcome-badge {
+    background: rgba(59, 130, 246, 0.16) !important;
+    color: #bfdbfe !important;
+    border: 1px solid rgba(59, 130, 246, 0.24) !important;
+}
+
+.welcome-feature-icon {
+    background: rgba(59, 130, 246, 0.14) !important;
+    color: #93c5fd !important;
+}
+
+.welcome-btn-light {
+    background: #111827 !important;
+    color: #f8fbff !important;
+    border: 1px solid #263348 !important;
+}
+
+.welcome-btn-light:hover {
+    background: #152033 !important;
+    color: #ffffff !important;
+}
+
+.alert-danger {
+    background: rgba(239, 68, 68, 0.14) !important;
+    border: 1px solid rgba(239, 68, 68, 0.28) !important;
+    color: #fca5a5 !important;
 }

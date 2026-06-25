@@ -3,14 +3,40 @@
 namespace App\Http\Controllers;
 
 use App\Models\Holiday;
+use App\Models\PaymentGroup;
 use App\Models\Subscription;
+use App\Models\SubscriptionPackage;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class SubscriptionController extends Controller
 {
+    private function syncSubscriptionStatuses(): void
+    {
+        Subscription::syncExpired();
+    }
+
+    private function packagePrices(): array
+    {
+        return [
+            'Harian' => 50000,
+            'Mingguan' => 250000,
+            'Bulanan' => 800000,
+        ];
+    }
+
+    private function packageDurations(): array
+    {
+        return [
+            'Harian' => 1,
+            'Mingguan' => 5,
+            'Bulanan' => 20,
+        ];
+    }
+
     /*
     |--------------------------------------------------------------------------
     | INDEX
@@ -18,24 +44,13 @@ class SubscriptionController extends Controller
     */
     public function index()
     {
-        Subscription::where(
-            'status',
-            'pending_cash'
-        )
-            ->where(
-                'cash_deadline',
-                '<',
-                now()
-            )
-            ->update([
-                'status' => 'cancelled',
-            ]);
+        $this->syncSubscriptionStatuses();
 
         $kids = auth()->user()
             ->kids()
             ->with([
                 'activeSubscription',
-                'latestSubscription',
+                'latestSubscription.paymentGroup',
             ])
             ->get();
 
@@ -49,110 +64,190 @@ class SubscriptionController extends Controller
     */
     public function create()
     {
+        $this->syncSubscriptionStatuses();
+
+        $today = Carbon::today()->toDateString();
+
         $kids = auth()->user()
             ->kids()
-            ->whereDoesntHave('subscriptions', function ($query) {
+            ->whereDoesntHave('subscriptions', function ($query) use ($today) {
                 $query->whereIn('status', [
                     'pending',
                     'pending_cash',
-                    'active',
-                ]);
+                ])
+                    ->orWhere(function ($query) use ($today) {
+                        $query->where('status', 'active')
+                            ->whereDate('end_date', '>=', $today);
+                    });
             })
             ->get();
 
-        return view('subscriptions.create', compact('kids'));
+        $packages = SubscriptionPackage::where('is_active', true)
+            ->orderBy('price')
+            ->get();
+
+        return view('subscriptions.create', compact('kids', 'packages'));
     }
 
     /*
     |--------------------------------------------------------------------------
-    | STORE
+    | STORE - MEMBUAT TAGIHAN GABUNGAN
     |--------------------------------------------------------------------------
     */
     public function store(Request $request)
     {
         $request->validate([
-            'kid_id' => 'required|exists:kids,id',
-            'package_name' => 'required|in:Harian,Mingguan,Bulanan',
+            'kid_ids' => 'nullable|array',
+            'kid_ids.*' => 'exists:kids,id',
+            'kid_id' => 'nullable|exists:kids,id',
+            'package_id' => 'required|exists:subscription_packages,id',
             'payment_method' => 'required|in:QRIS,Cash',
         ]);
 
-        $kid = auth()->user()
-            ->kids()
-            ->findOrFail($request->kid_id);
+        /*
+        |--------------------------------------------------------------------------
+        | Support dua bentuk input:
+        | - kid_ids[] untuk sistem baru multi anak
+        | - kid_id untuk sistem lama satu anak
+        |--------------------------------------------------------------------------
+        */
+        $selectedKidIds = collect($request->input('kid_ids', []));
 
-        $alreadySubscribed = Subscription::where('kid_id', $kid->id)
-            ->whereIn('status', [
-                'pending',
-                'active',
-                'pending_cash',
-            ])
-            ->exists();
-
-        if ($alreadySubscribed) {
-            return redirect('/subscriptions')
-                ->with('error', 'Anak ini sudah memiliki langganan aktif atau sedang menunggu pembayaran.');
+        if ($request->filled('kid_id')) {
+            $selectedKidIds->push($request->kid_id);
         }
 
-        $prices = [
-            'Harian' => 50000,
-            'Mingguan' => 250000,
-            'Bulanan' => 800000,
-        ];
+        $selectedKidIds = $selectedKidIds
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($selectedKidIds->isEmpty()) {
+            return back()
+                ->withInput()
+                ->with('error', 'Pilih minimal satu anak untuk berlangganan.');
+        }
+
+        $kids = auth()->user()
+            ->kids()
+            ->whereIn('id', $selectedKidIds)
+            ->get();
+
+        if ($kids->count() !== $selectedKidIds->count()) {
+            return back()
+                ->withInput()
+                ->with('error', 'Ada data anak yang tidak valid atau bukan milik akun ini.');
+        }
+
+        $today = Carbon::today()->toDateString();
+
+        $alreadySubscriptions = Subscription::with('kid')
+            ->whereIn('kid_id', $selectedKidIds)
+            ->where(function ($query) use ($today) {
+                $query->whereIn('status', [
+                    'pending',
+                    'pending_cash',
+                ])
+                    ->orWhere(function ($query) use ($today) {
+                        $query->where('status', 'active')
+                            ->whereDate('end_date', '>=', $today);
+                    });
+            })
+            ->get();
+
+        if ($alreadySubscriptions->isNotEmpty()) {
+            $names = $alreadySubscriptions
+                ->pluck('kid.name')
+                ->filter()
+                ->implode(', ');
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Anak berikut sudah memiliki langganan aktif atau sedang menunggu pembayaran: '.$names
+                );
+        }
+
+        $package = SubscriptionPackage::where('is_active', true)
+            ->findOrFail($request->package_id);
+
+        $price = $package->price;
+
+        $totalPrice = $price * $kids->count();
 
         $cashDeadline = null;
 
-        if ($request->payment_method == 'Cash') {
+        if ($request->payment_method === 'Cash') {
             $cashDeadline = now()->addDays(3);
         }
 
-        $subscription = Subscription::create([
-            'user_id' => auth()->id(),
-            'kid_id' => $kid->id,
-            'package_name' => $request->package_name,
-            'price' => $prices[$request->package_name],
+        $paymentGroup = DB::transaction(function () use (
+            $request,
+            $kids,
+            $package,
+            $totalPrice,
+            $cashDeadline
+        ) {
+            $paymentGroup = PaymentGroup::create([
+                'user_id' => auth()->id(),
+                'invoice_code' => 'INV-'.now()->format('YmdHis').'-'.strtoupper(Str::random(4)),
+                'payment_method' => $request->payment_method,
+                'total_price' => $totalPrice,
+                'status' => 'pending',
+                'cash_deadline' => $cashDeadline,
+                'paid_at' => null,
+                'verified_by' => null,
+            ]);
 
-            'status' => $request->payment_method == 'Cash'
-                ? 'pending_cash'
-                : 'pending',
+            foreach ($kids as $kid) {
+                Subscription::create([
+                    'user_id' => auth()->id(),
+                    'kid_id' => $kid->id,
+                    'payment_group_id' => $paymentGroup->id,
+                    'package_name' => $package->name,
+                    'price' => $package->price,
+                    'duration_days' => $package->duration_days,
+                    'status' => $request->payment_method === 'Cash'
+                        ? 'pending_cash'
+                        : 'pending',
+                    'payment_method' => $request->payment_method,
+                    'qris_image' => 'qris/qris-default.png',
+                    'start_date' => null,
+                    'end_date' => null,
+                    'is_paused' => false,
+                    'remaining_days' => 0,
+                    'cash_deadline' => $cashDeadline,
+                ]);
+            }
 
-            'payment_method' => $request->payment_method,
+            return $paymentGroup;
+        });
 
-            'qris_image' => 'qris/qris-default.png',
-
-            'start_date' => null,
-            'end_date' => null,
-
-            'is_paused' => false,
-            'remaining_days' => 0,
-            'cash_deadline' => $cashDeadline,
-        ]);
-
-        if ($request->payment_method == 'Cash') {
-
-            return redirect(
-                route(
-                    'subscriptions.cash',
-                    $subscription->id
-                )
-            );
-        }
-
-        return redirect(
-            route(
-                'subscriptions.payment',
-                $subscription->id
-            )
-        );
+        return redirect()
+            ->route('subscriptions.groupPayment', $paymentGroup->id)
+            ->with('success', 'Tagihan gabungan berhasil dibuat.');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | PAYMENT LAMA - JIKA DATA LAMA MASIH ADA
+    |--------------------------------------------------------------------------
+    */
     public function payment($id)
     {
         $subscription = Subscription::with([
             'kid',
             'latestTransaction',
+            'paymentGroup',
         ])
             ->where('user_id', auth()->id())
             ->findOrFail($id);
+
+        if ($subscription->payment_group_id) {
+            return redirect()
+                ->route('subscriptions.groupPayment', $subscription->payment_group_id);
+        }
 
         if (
             $subscription->status != 'pending'
@@ -170,6 +265,11 @@ class SubscriptionController extends Controller
         $subscription = Subscription::where('user_id', auth()->id())
             ->where('status', 'pending')
             ->findOrFail($id);
+
+        if ($subscription->payment_group_id) {
+            return redirect()
+                ->route('subscriptions.groupPayment', $subscription->payment_group_id);
+        }
 
         $existingTransaction = Transaction::where('subscription_id', $subscription->id)
             ->where('payment_status', 'pending')
@@ -197,7 +297,7 @@ class SubscriptionController extends Controller
 
     public function simulatePaymentSuccess($id)
     {
-        $transaction = Transaction::with('subscription')
+        $transaction = Transaction::with('subscription.paymentGroup')
             ->where('user_id', auth()->id())
             ->findOrFail($id);
 
@@ -208,34 +308,286 @@ class SubscriptionController extends Controller
 
         $subscription = $transaction->subscription;
 
-        $durations = [
-            'Harian' => 1,
-            'Mingguan' => 5,
-            'Bulanan' => 20,
-        ];
+        if ($subscription->payment_group_id) {
+            return redirect()
+                ->route('subscriptions.groupPayment', $subscription->payment_group_id);
+        }
 
-        $duration = $durations[$subscription->package_name] ?? 1;
-
-        DB::transaction(function () use ($transaction, $subscription, $duration) {
+        DB::transaction(function () use ($transaction, $subscription) {
             $transaction->update([
                 'payment_status' => 'paid',
                 'transaction_code' => 'SIM-'.now()->format('YmdHis'),
                 'paid_at' => now(),
             ]);
 
-            $startDate = $this->getSubscriptionStartDate();
-            $endDate = $this->addSchoolDays($startDate, $duration);
-
-            $subscription->update([
-                'status' => 'active',
-                'payment_method' => 'QRIS',
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-            ]);
+            $this->activateSubscription($subscription, 'QRIS');
         });
 
         return redirect('/subscriptions')
             ->with('success', 'Pembayaran berhasil. Langganan sudah aktif.');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PAYMENT GROUP - TAGIHAN GABUNGAN
+    |--------------------------------------------------------------------------
+    */
+    public function groupPayment($id)
+    {
+        $paymentGroup = PaymentGroup::with([
+            'subscriptions.kid',
+        ])
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
+
+        return view('subscriptions.group-payment', compact('paymentGroup'));
+    }
+
+    public function simulateGroupPaymentSuccess($id)
+    {
+        $paymentGroup = PaymentGroup::with([
+            'subscriptions',
+        ])
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
+
+        if ($paymentGroup->payment_method !== 'QRIS') {
+            return back()
+                ->with('error', 'Simulasi pembayaran hanya berlaku untuk metode QRIS.');
+        }
+
+        if ($paymentGroup->status === 'paid') {
+            return redirect('/subscriptions')
+                ->with('success', 'Tagihan ini sudah dibayar sebelumnya.');
+        }
+
+        DB::transaction(function () use ($paymentGroup) {
+            $paymentGroup->update([
+                'status' => 'paid',
+                'paid_at' => now(),
+            ]);
+
+            foreach ($paymentGroup->subscriptions as $subscription) {
+                $this->activateSubscription($subscription, 'QRIS');
+
+                Transaction::create([
+                    'subscription_id' => $subscription->id,
+                    'user_id' => $paymentGroup->user_id,
+                    'order_id' => $paymentGroup->invoice_code.'-'.$subscription->id,
+                    'amount' => $subscription->price,
+                    'payment_method' => 'QRIS',
+                    'payment_status' => 'paid',
+                    'payment_url' => null,
+                    'transaction_code' => 'SIM-'.now()->format('YmdHis').'-'.$subscription->id,
+                    'paid_at' => now(),
+                ]);
+            }
+        });
+
+        return redirect('/subscriptions')
+            ->with('success', 'Pembayaran gabungan berhasil. Semua langganan anak telah aktif.');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN TRANSAKSI
+    |--------------------------------------------------------------------------
+    */
+    public function adminTransaksi()
+    {
+        $this->syncSubscriptionStatuses();
+
+        $subscriptions = Subscription::with([
+            'user',
+            'kid',
+            'paymentGroup',
+        ])
+            ->latest()
+            ->get();
+
+        return view('transaksi.index', compact('subscriptions'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | VERIFIKASI PEMBAYARAN QRIS OLEH ADMIN
+    |--------------------------------------------------------------------------
+    */
+    public function verifikasiPembayaran($id)
+    {
+        $subscription = Subscription::with('paymentGroup.subscriptions')
+            ->findOrFail($id);
+
+        if ($subscription->payment_group_id) {
+            $paymentGroup = $subscription->paymentGroup;
+
+            if (! $paymentGroup) {
+                return back()->with('error', 'Data tagihan gabungan tidak ditemukan.');
+            }
+
+            if ($paymentGroup->status === 'paid') {
+                return back()->with('success', 'Tagihan ini sudah dibayar sebelumnya.');
+            }
+
+            DB::transaction(function () use ($paymentGroup) {
+                $paymentGroup->update([
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'verified_by' => auth()->id(),
+                ]);
+
+                foreach ($paymentGroup->subscriptions as $item) {
+                    $this->activateSubscription($item, 'QRIS');
+                }
+            });
+
+            return back()->with('success', 'Pembayaran gabungan berhasil diverifikasi.');
+        }
+
+        if ($subscription->status !== 'pending') {
+            return back()->with(
+                'error',
+                'Langganan ini tidak dalam status menunggu pembayaran QRIS.'
+            );
+        }
+
+        $this->activateSubscription($subscription, 'QRIS');
+
+        return back()->with('success', 'Pembayaran berhasil diverifikasi.');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CASH
+    |--------------------------------------------------------------------------
+    */
+    public function cashPayment($id)
+    {
+        $subscription = Subscription::with('paymentGroup.subscriptions.kid')
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
+
+        if ($subscription->payment_group_id) {
+            return redirect()
+                ->route('subscriptions.groupPayment', $subscription->payment_group_id);
+        }
+
+        return view(
+            'subscriptions.cash',
+            compact('subscription')
+        );
+    }
+
+    public function cashConfirm($id)
+    {
+        $subscription = Subscription::where(
+            'user_id',
+            auth()->id()
+        )->findOrFail($id);
+
+        if ($subscription->payment_group_id) {
+            return redirect()
+                ->route('subscriptions.groupPayment', $subscription->payment_group_id)
+                ->with(
+                    'success',
+                    'Permintaan pembayaran cash berhasil dibuat. Silakan lakukan pembayaran kepada admin atau sopir.'
+                );
+        }
+
+        $subscription->update([
+            'status' => 'pending_cash',
+        ]);
+
+        return redirect('/subscriptions')
+            ->with(
+                'success',
+                'Permintaan pembayaran cash berhasil dikirim. Silakan lakukan pembayaran kepada admin atau sopir.'
+            );
+    }
+
+    public function verifyCash($id)
+    {
+        $subscription = Subscription::with('paymentGroup.subscriptions')
+            ->findOrFail($id);
+
+        if ($subscription->payment_group_id) {
+            $paymentGroup = $subscription->paymentGroup;
+
+            if (! $paymentGroup) {
+                return back()->with('error', 'Data tagihan gabungan tidak ditemukan.');
+            }
+
+            if ($paymentGroup->status === 'paid') {
+                return back()->with('success', 'Tagihan ini sudah diverifikasi sebelumnya.');
+            }
+
+            DB::transaction(function () use ($paymentGroup) {
+                $paymentGroup->update([
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'verified_by' => auth()->id(),
+                ]);
+
+                foreach ($paymentGroup->subscriptions as $item) {
+                    $this->activateSubscription($item, 'Cash');
+                }
+            });
+
+            return back()
+                ->with('success', 'Pembayaran cash gabungan berhasil diverifikasi.');
+        }
+
+        if ($subscription->status != 'pending_cash') {
+            return back()->with(
+                'error',
+                'Status langganan bukan pending cash.'
+            );
+        }
+
+        $this->activateSubscription($subscription, 'Cash');
+
+        return back()->with(
+            'success',
+            'Pembayaran cash berhasil diverifikasi.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | HELPER AKTIVASI LANGGANAN
+    |--------------------------------------------------------------------------
+    */
+    private function activateSubscription(
+        Subscription $subscription,
+        string $paymentMethod
+    ): void {
+        $duration = $subscription->duration_days;
+
+        if (! $duration) {
+            $durations = $this->packageDurations();
+            $duration = $durations[$subscription->package_name] ?? 1;
+        }
+
+        $startDate = $this->getSubscriptionStartDate();
+
+        $endDate = $this->addSchoolDays(
+            $startDate,
+            $duration
+        );
+
+        $data = [
+            'status' => 'active',
+            'payment_method' => $paymentMethod,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ];
+
+        if ($paymentMethod === 'Cash') {
+            $data['cash_paid_at'] = now();
+            $data['verified_by'] = auth()->id();
+        }
+
+        $subscription->update($data);
     }
 
     private function addSchoolDays(
@@ -266,68 +618,9 @@ class SubscriptionController extends Controller
         return $date;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ADMIN TRANSAKSI
-    |--------------------------------------------------------------------------
-    */
-    public function adminTransaksi()
-    {
-        $subscriptions = Subscription::with([
-            'user',
-            'kid',
-        ])
-            ->latest()
-            ->get();
-
-        return view('transaksi.index', compact('subscriptions'));
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | VERIFIKASI PEMBAYARAN SEMENTARA
-    |--------------------------------------------------------------------------
-    | Ini bisa dipakai dulu untuk simulasi.
-    | Nanti kalau payment gateway sudah dipasang,
-    | bagian ini akan diganti oleh callback payment gateway.
-    */
-    public function verifikasiPembayaran($id)
-    {
-        $subscription = Subscription::findOrFail($id);
-
-        $durations = [
-            'Harian' => 1,
-            'Mingguan' => 5,
-            'Bulanan' => 20,
-        ];
-
-        $duration = $durations[$subscription->package_name] ?? 1;
-
-        $startDate = $this->getSubscriptionStartDate();
-        $endDate = $this->addSchoolDays($startDate, $duration);
-
-        $subscription->update([
-            'status' => 'active',
-            'payment_method' => 'QRIS',
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-        ]);
-
-        return back()->with('success', 'Pembayaran berhasil diverifikasi');
-    }
-
     private function getSubscriptionStartDate()
     {
         $date = Carbon::now();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Batas operasional armada
-        |--------------------------------------------------------------------------
-        | Jika pembayaran dilakukan setelah pukul 05:30,
-        | maka langganan mulai berlaku pada hari sekolah berikutnya.
-        |--------------------------------------------------------------------------
-        */
 
         $cutoffHour = 5;
         $cutoffMinute = 30;
@@ -345,12 +638,6 @@ class SubscriptionController extends Controller
             $date->addDay();
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Lewati Sabtu, Minggu, dan Hari Libur Nasional
-        |--------------------------------------------------------------------------
-        */
-
         while (
             $date->isWeekend()
             ||
@@ -363,74 +650,5 @@ class SubscriptionController extends Controller
         }
 
         return $date->startOfDay();
-    }
-
-    public function cashPayment($id)
-    {
-        $subscription = Subscription::findOrFail($id);
-
-        return view(
-            'subscriptions.cash',
-            compact('subscription')
-        );
-    }
-
-    public function cashConfirm($id)
-    {
-        $subscription = Subscription::where(
-            'user_id',
-            auth()->id()
-        )->findOrFail($id);
-
-        $subscription->update([
-            'status' => 'pending_cash',
-        ]);
-
-        return redirect('/subscriptions')
-            ->with(
-                'success',
-                'Permintaan pembayaran cash berhasil dikirim. Silakan lakukan pembayaran kepada admin atau sopir.'
-            );
-    }
-
-    public function verifyCash($id)
-    {
-        $subscription = Subscription::findOrFail($id);
-
-        if ($subscription->status != 'pending_cash') {
-            return back()->with(
-                'error',
-                'Status langganan bukan pending cash.'
-            );
-        }
-
-        $durations = [
-            'Harian' => 1,
-            'Mingguan' => 5,
-            'Bulanan' => 20,
-        ];
-
-        $duration =
-            $durations[$subscription->package_name] ?? 1;
-
-        $startDate = $this->getSubscriptionStartDate();
-
-        $endDate = $this->addSchoolDays(
-            $startDate,
-            $duration
-        );
-
-        $subscription->update([
-            'status' => 'active',
-            'cash_paid_at' => now(),
-            'verified_by' => auth()->id(),
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-        ]);
-
-        return back()->with(
-            'success',
-            'Pembayaran cash berhasil diverifikasi.'
-        );
     }
 }

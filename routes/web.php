@@ -8,6 +8,7 @@ use App\Http\Controllers\KidController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatAntarJemputController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SubscriptionPackageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -50,15 +51,15 @@ Route::resource('kids', KidController::class)
 Route::resource('subscriptions', SubscriptionController::class)
     ->middleware('auth');
 
-Route::post(
-    '/subscriptions/{id}/pause',
-    [SubscriptionController::class, 'pause']
-)->name('subscriptions.pause');
+// Route::post(
+//     '/subscriptions/{id}/pause',
+//     [SubscriptionController::class, 'pause']
+// )->name('subscriptions.pause');
 
-Route::post(
-    '/subscriptions/{id}/resume',
-    [SubscriptionController::class, 'resume']
-)->name('subscriptions.resume');
+// Route::post(
+//     '/subscriptions/{id}/resume',
+//     [SubscriptionController::class, 'resume']
+// )->name('subscriptions.resume');
 
 Route::get(
     '/subscriptions/{id}/cash',
@@ -80,11 +81,14 @@ Route::get('/profile', [ProfileController::class, 'index'])
 Route::post('/profile', [ProfileController::class, 'update'])
     ->middleware('auth');
 
-// =======================
+// / =======================
 // SUBSCRIPTIONS
 // =======================
 
+Route::resource('subscriptions', SubscriptionController::class)
+    ->middleware('auth');
 
+// PEMBAYARAN QRIS PER SUBSCRIPTION LAMA
 Route::get(
     '/subscriptions/{id}/payment',
     [SubscriptionController::class, 'payment']
@@ -106,6 +110,36 @@ Route::post(
     ->middleware('auth')
     ->name('transactions.simulateSuccess');
 
+// PEMBAYARAN CASH
+Route::get(
+    '/subscriptions/{id}/cash',
+    [SubscriptionController::class, 'cashPayment']
+)
+    ->middleware('auth')
+    ->name('subscriptions.cash');
+
+Route::post(
+    '/subscriptions/{id}/cash-confirm',
+    [SubscriptionController::class, 'cashConfirm']
+)
+    ->middleware('auth')
+    ->name('subscriptions.cash.confirm');
+
+// PEMBAYARAN GABUNGAN / MULTI ANAK
+Route::get(
+    '/subscriptions/payment-groups/{id}/payment',
+    [SubscriptionController::class, 'groupPayment']
+)
+    ->middleware('auth')
+    ->name('subscriptions.groupPayment');
+
+Route::post(
+    '/subscriptions/payment-groups/{id}/simulate-success',
+    [SubscriptionController::class, 'simulateGroupPaymentSuccess']
+)
+    ->middleware('auth')
+    ->name('subscriptions.groupPayment.simulateSuccess');
+
 // =======================
 // RIWAYAT ORANG TUA
 // =======================
@@ -121,6 +155,9 @@ Route::get('/riwayat', [RiwayatAntarJemputController::class, 'parentHistory'])
 Route::middleware(['auth'])
     ->prefix('admin')
     ->group(function () {
+
+        Route::resource('packages', SubscriptionPackageController::class)
+            ->except(['show']);
 
         // DRIVER
         Route::resource('drivers', DriverController::class);

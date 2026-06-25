@@ -6,7 +6,7 @@
         <div>
             <div class="page-title">Edit Sopir</div>
             <div class="page-subtitle">
-                Perbarui akun login sopir, nomor telepon, kendaraan, kapasitas, dan status
+                Perbarui akun login sopir, nomor telepon, kendaraan, dan kapasitas
             </div>
         </div>
 
@@ -106,18 +106,28 @@
                 </small>
             </div>
 
-            <div class="mb-4">
-                <label class="form-label">Status</label>
+            <div class="alert alert-info mb-4">
+                <strong>Informasi:</strong>
+                Status sopir tidak diubah secara manual pada form edit.
+                Status operasional sopir ditentukan oleh sistem berdasarkan aktivitas perjalanan.
 
-                <select name="status" class="form-select" required>
-                    <option value="online" {{ old('status', $driver->status) == 'online' ? 'selected' : '' }}>
-                        Online
-                    </option>
+                <div class="mt-2">
+                    <strong>Status saat ini:</strong>
 
-                    <option value="offline" {{ old('status', $driver->status) == 'offline' ? 'selected' : '' }}>
-                        Offline
-                    </option>
-                </select>
+                    @if($driver->status_label === 'On Trip')
+                        <span class="badge-status" style="background: #fff3cd; color: #856404;">
+                            On Trip
+                        </span>
+                    @elseif($driver->status_label === 'Online')
+                        <span class="badge-status badge-active">
+                            Online
+                        </span>
+                    @else
+                        <span class="badge-status badge-danger">
+                            Offline
+                        </span>
+                    @endif
+                </div>
             </div>
 
             <div class="form-action-row">
