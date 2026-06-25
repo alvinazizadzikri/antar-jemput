@@ -20,7 +20,7 @@ class ProfileController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email',
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:244',
         ]);
 
         // UPDATE DATA
