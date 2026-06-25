@@ -13,31 +13,60 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+
         Subscription::syncExpired();
 
         if ($user->role == 'parent') {
+            $user->load(['kids', 'subscriptions']);
+
             $kids = $user->kids ?? collect();
             $subscriptions = $user->subscriptions ?? collect();
-            $activeSubscriptions = $subscriptions
-                ->filter(function ($subscription) {
-                    return $subscription->isActiveToday();
-                })
-                ->count();
+
+            $activeSubscriptionsCollection = $subscriptions->filter(function ($subscription) {
+                return $subscription->isActiveToday();
+            });
+
+            $activeSubscriptions = $activeSubscriptionsCollection->count();
+
+            $activeKidIds = $activeSubscriptionsCollection
+                ->pluck('kid_id')
+                ->filter()
+                ->unique()
+                ->values();
+
+            $needSubscriptionCount = max($kids->count() - $activeKidIds->count(), 0);
+
+            $latestKids = $kids
+                ->sortByDesc('created_at')
+                ->take(3)
+                ->values();
+
+            $latestSubscriptions = $subscriptions
+                ->sortByDesc('created_at')
+                ->take(3)
+                ->values();
 
             return view('dashboard', compact(
                 'kids',
                 'subscriptions',
-                'activeSubscriptions'
+                'activeSubscriptions',
+                'activeKidIds',
+                'needSubscriptionCount',
+                'latestKids',
+                'latestSubscriptions'
             ));
         }
 
         if ($user->role == 'admin') {
             $totalKids = Kid::count();
+
             $totalDrivers = Driver::count();
+
             $totalSubscriptions = Subscription::where('status', 'active')
                 ->whereDate('start_date', '<=', now()->toDateString())
                 ->whereDate('end_date', '>=', now()->toDateString())
                 ->count();
+
             $totalTrips = RiwayatAntarJemput::count();
 
             return view('dashboard_admin', compact(
@@ -61,6 +90,7 @@ class DashboardController extends Controller
             }
 
             $totalJobs = $jobs->count();
+
             $activeJobs = $jobs->whereIn('status', [
                 'assigned',
                 'picked_up',
