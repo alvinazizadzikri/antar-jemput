@@ -82,21 +82,9 @@
                 </small>
             </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label class="form-label">Latitude</label>
+            <input type="hidden" name="latitude" id="latitude" value="{{ $kid->latitude }}">
 
-                    <input type="text" name="latitude" id="latitude" readonly class="form-control"
-                        value="{{ old('latitude', $kid->latitude) }}">
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Longitude</label>
-
-                    <input type="text" name="longitude" id="longitude" readonly class="form-control"
-                        value="{{ old('longitude', $kid->longitude) }}">
-                </div>
-            </div>
+            <input type="hidden" name="longitude" id="longitude" value="{{ $kid->longitude }}">
 
             <div class="mb-3">
                 <label class="form-label">Titik Jemput</label>
@@ -152,10 +140,10 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            let defaultLat = {{ $kid->latitude ?? -7.250445 }};
-            let defaultLng = {{ $kid->longitude ?? 112.768845 }};
+            let defaultLat = {{ $kid->latitude ?? -8.2308 }};
+            let defaultLng = {{ $kid->longitude ?? 111.3227 }};
 
-            var map = L.map('map').setView([defaultLat, defaultLng], 13);
+            var map = L.map('map').setView([defaultLat, defaultLng], 14);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'

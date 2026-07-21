@@ -49,6 +49,9 @@
                     atau hari libur nasional, sistem otomatis
                     menggeser layanan ke hari sekolah berikutnya.
                 </li>
+                <li>
+                    Hari layanan yang digunakan untuk izin tetap dihitung dalam masa aktif langganan dan tidak dapat digantikan.
+                </li>
 
             </ul>
 

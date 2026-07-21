@@ -16,6 +16,8 @@ class SubscriptionController extends Controller
 {
     private function syncSubscriptionStatuses(): void
     {
+        Subscription::syncScheduled();
+
         Subscription::syncExpired();
     }
 
@@ -576,7 +578,10 @@ class SubscriptionController extends Controller
         );
 
         $data = [
-            'status' => 'active',
+            'status' => $startDate->isToday()
+                ? 'active'
+                : 'scheduled',
+
             'payment_method' => $paymentMethod,
             'start_date' => $startDate,
             'end_date' => $endDate,

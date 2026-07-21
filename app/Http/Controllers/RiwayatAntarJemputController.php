@@ -107,9 +107,12 @@ class RiwayatAntarJemputController extends Controller
             'subscription',
         ])
             ->whereHas('subscriptions', function ($query) {
-                $query->where('status', 'active')
-                    ->whereDate('start_date', '<=', Carbon::today())
-                    ->whereDate('end_date', '>=', Carbon::today());
+                $query->whereIn('status', [
+                    'active',
+                    'scheduled',
+                ])
+                    ->whereDate('start_date', '<=', Carbon::tomorrow())
+                    ->whereDate('end_date', '>=', Carbon::tomorrow());
             })
             ->whereDoesntHave('trips', function ($query) use ($activeStatuses) {
                 $query->whereIn('status', $activeStatuses);
@@ -133,6 +136,7 @@ class RiwayatAntarJemputController extends Controller
             'driver_id' => 'required|exists:drivers,id',
             'kid_ids' => 'required|array|min:1',
             'kid_ids.*' => 'exists:kids,id',
+            'trip_date' => 'required|date',
             'pickup_time' => 'required|date_format:H:i',
         ]);
 
@@ -145,7 +149,7 @@ class RiwayatAntarJemputController extends Controller
 
         $absence = KidAbsence::with('kid')
             ->whereIn('kid_id', $selectedKidIds)
-            ->whereDate('absence_date', Carbon::today())
+            ->whereDate('absence_date', $request->trip_date)
             ->first();
 
         if ($absence) {
@@ -161,10 +165,15 @@ class RiwayatAntarJemputController extends Controller
 
         $selectedKids = Kid::with(['parent', 'subscription'])
             ->whereIn('id', $selectedKidIds)
-            ->whereHas('subscriptions', function ($query) {
-                $query->where('status', 'active')
-                    ->whereDate('start_date', '<=', Carbon::today())
-                    ->whereDate('end_date', '>=', Carbon::today());
+            ->whereHas('subscriptions', function ($query) use ($request) {
+
+                $query->whereIn('status', [
+                    'active',
+                    'scheduled',
+                ])
+                    ->whereDate('start_date', '<=', $request->trip_date)
+                    ->whereDate('end_date', '>=', $request->trip_date);
+
             })
             ->get();
 
@@ -205,22 +214,37 @@ class RiwayatAntarJemputController extends Controller
             }
         }
 
-        $pickupDateTime = Carbon::today()->format('Y-m-d').' '.$request->pickup_time.':00';
+        $pickupDateTime = Carbon::parse(
+            $request->trip_date.' '.$request->pickup_time
+        )->format('Y-m-d H:i:s');
 
         $tripCode = 'TRIP-'.now()->format('YmdHis').'-'.strtoupper(Str::random(4));
 
-        DB::transaction(function () use ($selectedKids, $driver, $pickupDateTime, $tripCode) {
+        $tripDate = $request->trip_date;
+
+        DB::transaction(function () use (
+            $selectedKids,
+            $driver,
+            $pickupDateTime,
+            $tripCode,
+            $tripDate
+        ) {
+
             foreach ($selectedKids as $kid) {
+
                 RiwayatAntarJemput::create([
                     'kid_id' => $kid->id,
                     'driver_id' => $driver->id,
                     'trip_code' => $tripCode,
+                    'trip_date' => $tripDate,
                     'pickup_time' => $pickupDateTime,
                     'actual_pickup_time' => null,
                     'dropoff_time' => null,
                     'status' => 'assigned',
                 ]);
+
             }
+
         });
 
         return redirect('/admin/trips')
@@ -279,7 +303,8 @@ class RiwayatAntarJemputController extends Controller
             'kid.subscription',
         ])
             ->where('driver_id', $driver->id)
-            ->latest()
+            ->orderBy('trip_date', 'asc')
+            ->orderBy('pickup_time', 'asc')
             ->get();
 
         $tripGroups = $trips->groupBy(function ($trip) {

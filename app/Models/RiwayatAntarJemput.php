@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class RiwayatAntarJemput extends Model
 {
     protected $fillable = [
-        'driver_id',
         'kid_id',
+        'driver_id',
         'trip_code',
-        'status',
+        'trip_date',
         'pickup_time',
         'actual_pickup_time',
         'dropoff_time',
+        'status',
     ];
 
     public function driver()

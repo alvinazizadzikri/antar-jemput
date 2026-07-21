@@ -55,6 +55,19 @@ class Subscription extends Model
             ]);
     }
 
+    public static function syncScheduled(): void
+    {
+        self::where('status', 'scheduled')
+            ->whereDate(
+                'start_date',
+                '<=',
+                Carbon::today()
+            )
+            ->update([
+                'status' => 'active',
+            ]);
+    }
+
     public function isExpired(): bool
     {
         return $this->status === 'active'
@@ -83,12 +96,19 @@ class Subscription extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->effective_status) {
+
             'pending' => 'Menunggu Pembayaran QRIS',
+
             'pending_cash' => 'Menunggu Pembayaran Cash',
+
+            'scheduled' => 'Mulai Besok',
+
             'active' => 'Sedang Berlaku',
+
             'expired' => 'Berakhir',
+
             'cancelled' => 'Dibatalkan',
-            'paid' => 'Dibayar',
+
             default => ucfirst($this->effective_status),
         };
     }

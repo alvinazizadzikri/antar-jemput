@@ -153,14 +153,31 @@
                 </div>
             </div>
 
+            <div class="mb-3">
+                <label class="form-label">
+                    Tanggal Jemput
+                </label>
+
+                <input type="date" name="trip_date" class="form-control"
+                    value="{{ old('trip_date', date('Y-m-d', strtotime('+1 day'))) }}" required>
+
+                <small class="text-muted">
+                    Pilih tanggal perjalanan yang akan dilakukan.
+                    Admin dapat membuat jadwal untuk hari berikutnya sebelum layanan dimulai.
+                </small>
+            </div>
+
+
             <div class="mb-4">
-                <label class="form-label">Jam Rencana Jemput</label>
+                <label class="form-label">
+                    Jam Rencana Jemput
+                </label>
 
                 <input type="time" name="pickup_time" class="form-control" value="{{ old('pickup_time') }}" required>
 
                 <small class="text-muted">
-                    Jam ini adalah jadwal rencana jemput dari admin. Jam aktual akan dicatat saat sopir menekan “Anak
-                    Dijemput”.
+                    Jam ini merupakan jadwal rencana jemput dari admin.
+                    Waktu aktual akan tercatat ketika sopir memperbarui status perjalanan.
                 </small>
             </div>
 
